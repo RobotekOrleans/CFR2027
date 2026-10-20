@@ -1,8 +1,26 @@
-**About**
+Project Name / Robotics Cup 2026
+About
 
-The project was proposed by robotek Orléans and the goal is for a robot to participate to the French robotics cup.
-The French robotics cup is a competition organized by eurobot, the goal of the cup is create a autonomous robot with the reglement-file. the organisator make us free to choice the structure and the actionor of the robot. The only things obligatory is the homologation 
+This project was proposed by Robotek Orléans with the goal of designing and building an autonomous robot to participate in the French Robotics Cup (Coupe de France de Robotique), organized under Eurobot regulations.
 
+The organizers grant total freedom regarding the mechanical structure and actuation systems of the robot. The primary constraints are adhering to the official rulebook (règlement) and successfully passing the homologation phase.
+The Robot
 
-The repertoire was sorted by category; all files given by the organiser of the French Robotics Cup are in the repertoire named: regulation file.
-All information about the gestion of the project is in the project gestion repertory.
+The robot features a square-shaped base.
+
+    (Image of the 3D model of the robot)
+
+Getting Started
+
+To power on the robot, simply plug in the main battery, and the system will boot up automatically.
+Repository Structure
+
+The repository is organized by categories as follows:
+
+    regulation-file/ — Official rules, documentation, and files provided by the organizers of the French Robotics Cup.
+
+    project-management/ — Information, planning, and documentation regarding project management.
+
+    software/ — Source code, algorithms, and software architecture.
+
+    hardware/ — CAD files, schematics, and hardware documentation.
