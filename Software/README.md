@@ -1,4 +1,4 @@
-# ESP32 Drivetrain — CFR2027
+#  Software — CFR2027
 
 This directory contains the robot's software:
 * The **ESP32 WROOM32** code, controlling the drivetrain and handling sensor data acquisition.
@@ -20,9 +20,8 @@ The software relies on **FreeRTOS** and utilizes both cores of the ESP32 to ensu
   * **Motor Control:** Generating PWM and direction signals for motor drivers.
   * **Feedback Control:** Trajectory and motion control algorithms.
 
-### Inter-Core Communication
-
-**Core 1** receives instructions from **Core 0** via a FreeRTOS message queue (`xQueue`). This mechanism allows updating motor speed setpoints or triggering an immediate emergency stop if an obstacle is detected by an ultrasonic sensor.
+* Inter-Core Communication
+    **Core 1** receives instructions from **Core 0** via a FreeRTOS message queue (`xQueue`). This mechanism allows updating motor speed setpoints or triggering an immediate emergency stop if an obstacle is detected by an ultrasonic sensor.
 
 ---
 
@@ -40,13 +39,12 @@ Messages exchanged between the Raspberry Pi and the ESP32 use text frames enclos
 
 * **Motor Commands:** `<V,X0,X1,X2,X3>` (parsed by `parseData()`)
   * Speed setpoints for each motor.
-  * `X0` = Front-Left, `X1` = Front-Right, `X2` = Rear-Left, `X3` = Rear-Right.
+  * `X0` = Front-Left, `X1` = Front-Right, `X2` = Back-Left, `X3` = Back-Right.
 
 * **Ultrasonic Sensor Mask:** `<I,i0,i1,i2,i3>` (parsed by `parseData()`)
   * Enables/disables obstacle alerts for specific sensors (`0` or `1`).
-  * Sensors: `i0` = Front, `i1` = Right, `i2` = Left, `i3` = Rear.
+  * Sensors: `i0` = Front, `i1` = Right, `i2` = Left, `i3` = Back.
 
----
 
 ### ESP32 ➔ Raspberry Pi (Sent Data)
 
@@ -69,7 +67,7 @@ Messages exchanged between the Raspberry Pi and the ESP32 use text frames enclos
 
 ---
 
-## Building & Flashing
+## Building
 
 ### Prerequisites
 * [Visual Studio Code](https://code.visualstudio.com/) with the **PlatformIO IDE** extension.
