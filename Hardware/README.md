@@ -1,4 +1,4 @@
-## About
+# About
 
 Ce Folder présente les avancées du projet sur la partie mécanique et électrique. Cette partie s'inscrit dans le projet **CFR 2027** en collaboration avec _Robotek Orléans_ et _Polytech Orléans_.
 
