@@ -70,28 +70,28 @@ void parseData() //Répartition des valeurs reçu dans les variables de chaque m
     }
     else if(c_typeCmd == 'I') //Si le premier caractère est I c'est des données capteurs
     {
-      int n_i1, n_i2, n_i3, n_i4;
-      if (sscanf(c_receivedChars, "%c,%d,%d,%d,%d", &c_typeCmd, &n_i1, &n_i2, &n_i3, &n_i4) == 5) 
+      int n_i0, n_i1, n_i2, n_i3;
+      if (sscanf(c_receivedChars, "%c,%d,%d,%d,%d", &c_typeCmd, &n_i0, &n_i1, &n_i2, &n_i3) == 5) 
       {
         ul_lastComTime = millis();     // Reset Watchdog 
         bol_watchdogTriggered = false;
 
-        bol_ignoreSensor[0] = (n_i1 == 1); //True si i1 == 1, si true = ignorer les données du capteur.
-        bol_ignoreSensor[1] = (n_i2 == 1);
-        bol_ignoreSensor[2] = (n_i3 == 1);
-        bol_ignoreSensor[3] = (n_i4 == 1);
+        bol_ignoreSensor[0] = (n_i0 == 1); //True si i1 == 1, si true = ignorer les données du capteur.
+        bol_ignoreSensor[1] = (n_i1 == 1);
+        bol_ignoreSensor[2] = (n_i2 == 1);
+        bol_ignoreSensor[3] = (n_i3 == 1);
         //Retour des données dans le monitor
         Serial.print("✅ OK -> Commande: "); Serial.print(c_typeCmd);
-        Serial.print(" | Capteur 1 : "); Serial.print(n_i1);
-        Serial.print(" | Capteur 2 : "); Serial.println(n_i2);
-        Serial.print(" | Capteur 3 : "); Serial.print(n_i3);
-        Serial.print(" | Capteur 4 : "); Serial.println(n_i4);
+        Serial.print(" | Capteur 1 : "); Serial.print(n_i0);
+        Serial.print(" | Capteur 2 : "); Serial.println(n_i1);
+        Serial.print(" | Capteur 3 : "); Serial.print(n_i2);
+        Serial.print(" | Capteur 4 : "); Serial.println(n_i3);
         Serial.println("🛡️ Masques US mis à jour par la RPi !");
       }
     }
      else // Si il y a une erreur sur le format d'envois des données : 
      {
-      Serial.println("❌ Erreur de syntaxe (Format attendu : <V,X1,Y1,X2,Y2>) ou <I,i1,i2,i3,i4>");
+      Serial.println("❌ Erreur de syntaxe (Format attendu : <V,X0,X1,X2,X3>) ou <I,i1,i2,i3,i4>");
     }   
     bol_newData = false; //La transimission est terminé on remet le newData à false
   }
