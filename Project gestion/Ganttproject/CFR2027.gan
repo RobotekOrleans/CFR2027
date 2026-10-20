@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?><project name="Untitled Gantt Project" company="" webLink="http://" view-date="2026-08-01" view-index="0" gantt-divider-location="351" resource-divider-location="300" version="3.3.3316" locale="fr_FR">
+    <description/>
+    <view zooming-state="default:9" id="gantt-chart">
+        <field id="tpd3" name="Nom" width="200" order="0"/>
+        <field id="tpd4" name="Date de début" width="75" order="1"/>
+        <field id="tpd5" name="Date de fin" width="75" order="2"/>
+        <field id="tpd15" name="Notes" width="20" order="3"/>
+        <option id="filter.completedTasks" value="false"/>
+        <option id="filter.dueTodayTasks" value="false"/>
+        <option id="filter.overdueTasks" value="false"/>
+        <option id="filter.inProgressTodayTasks" value="false"/>
+        <timeline><![CDATA[8,14,2,7,5,6]]></timeline>
+        <option id="color.recent"><![CDATA[#ffcc00 #ff0033 #660000]]></option>
+    </view>
+    <view id="resource-table">
+        <field id="0" name="Nom" width="210" order="0"/>
+        <field id="1" name="Rôle par défaut" width="86" order="1"/>
+    </view>
+    <!-- -->
+    <calendars>
+        <day-types>
+            <day-type id="0"/>
+            <day-type id="1"/>
+            <default-week id="1" name="default" sun="1" mon="0" tue="0" wed="0" thu="0" fri="0" sat="1"/>
+            <only-show-weekends value="false"/>
+            <overriden-day-types/>
+            <days/>
+        </day-types>
+    </calendars>
+    <tasks empty-milestones="true">
+        <taskproperties>
+            <taskproperty id="tpd0" name="type" type="default" valuetype="icon"/>
+            <taskproperty id="tpd1" name="priority" type="default" valuetype="icon"/>
+            <taskproperty id="tpd2" name="info" type="default" valuetype="icon"/>
+            <taskproperty id="tpd3" name="name" type="default" valuetype="text"/>
+            <taskproperty id="tpd4" name="begindate" type="default" valuetype="date"/>
+            <taskproperty id="tpd5" name="enddate" type="default" valuetype="date"/>
+            <taskproperty id="tpd6" name="duration" type="default" valuetype="int"/>
+            <taskproperty id="tpd7" name="completion" type="default" valuetype="int"/>
+            <taskproperty id="tpd8" name="coordinator" type="default" valuetype="text"/>
+            <taskproperty id="tpd9" name="predecessorsr" type="default" valuetype="text"/>
+        </taskproperties>
+        <task id="0" uid="48969d58ee60441e9fec98cef65623ed" name="functional analysis" meeting="false" start="2026-09-15" duration="7" complete="0" expand="true">
+            <depend id="1" type="2" difference="0" hardness="Strong"/>
+        </task>
+        <task id="4" uid="45564932370b40bd8ae7f47bc8c4eaab" name="Risk analysis" meeting="false" start="2026-09-22" duration="1" complete="0" expand="true">
+            <depend id="1" type="2" difference="0" hardness="Strong"/>
+        </task>
+        <task id="1" uid="06932b9d9b6a48f8a4fc8c29dd55d1e0" name="Specifications" meeting="false" start="2026-09-24" duration="5" complete="0" expand="true">
+            <depend id="3" type="2" difference="0" hardness="Strong"/>
+        </task>
+        <task id="3" uid="36ea0024cd3944d894898ebc8dc513c0" name="Powerpoint" color="#ffcc00" meeting="false" start="2026-10-01" duration="3" complete="0" expand="true">
+            <depend id="2" type="2" difference="0" hardness="Strong"/>
+        </task>
+        <task id="2" uid="c0a943ad36844ba39e549ef05e5c11de" name="Audit 1" meeting="true" start="2026-10-06" duration="0" complete="0" priority="2" expand="true">
+            <depend id="9" type="2" difference="0" hardness="Strong"/>
+            <depend id="10" type="2" difference="0" hardness="Strong"/>
+        </task>
+        <task id="9" uid="34826805b8724d73856060510dab35d4" name="Technical specifications" meeting="false" start="2026-10-06" duration="30" complete="0" expand="true">
+            <depend id="11" type="2" difference="0" hardness="Strong"/>
+        </task>
+        <task id="10" uid="069a9e14d6b74c9fa9cd8b2bdd9afa1c" name="Construction of the rolling base for Robot P" color="#660000" meeting="false" start="2026-10-06" duration="30" complete="0" expand="true">
+            <depend id="11" type="2" difference="0" hardness="Strong"/>
+        </task>
+        <task id="11" uid="40f287fad0dd4f1dbe0c809d2c45de88" name="PowerPoint" color="#ffcc00" meeting="false" start="2026-11-17" duration="3" complete="0" expand="true">
+            <depend id="5" type="2" difference="0" hardness="Strong"/>
+        </task>
+        <task id="5" uid="a32c811e6aa9410590d0780165e78850" name="PDR" meeting="true" start="2026-11-20" duration="0" complete="0" expand="true">
+            <depend id="12" type="2" difference="0" hardness="Strong"/>
+            <depend id="13" type="2" difference="0" hardness="Strong"/>
+        </task>
+        <task id="12" uid="2b7fad48b5124110b5e2b0ffafb0ddcd" name="Perform the robot observation" color="#660000" meeting="false" start="2026-11-20" duration="120" complete="0" expand="true">
+            <depend id="14" type="2" difference="0" hardness="Strong"/>
+        </task>
+        <task id="13" uid="775a1b5f368d4a65a3d041c496717f32" name="Carry out the task of building walls" color="#660000" meeting="false" start="2026-11-20" duration="35" complete="0" expand="true">
+            <depend id="6" type="2" difference="0" hardness="Strong"/>
+            <depend id="14" type="2" difference="0" hardness="Strong"/>
+        </task>
+        <task id="6" uid="96792e2c34a24ab781f3ed530aaf2a00" name="CDR" meeting="true" start="2027-01-08" duration="0" complete="0" expand="true">
+            <depend id="15" type="2" difference="0" hardness="Strong"/>
+        </task>
+        <task id="15" uid="0fa5e54a94104cbfae9d14be13eac1f1" name="Buisness plan" meeting="false" start="2027-01-08" duration="23" complete="0" expand="true">
+            <depend id="7" type="2" difference="0" hardness="Strong"/>
+        </task>
+        <task id="7" uid="77c9dbcc8a124488bacc9dd1f74e33ec" name="Audit Marketing" meeting="true" start="2027-02-10" duration="0" complete="0" expand="true">
+            <depend id="8" type="2" difference="0" hardness="Strong"/>
+        </task>
+        <task id="8" uid="8976847cb3054b959f7983690af67317" name="PRR" meeting="true" start="2027-02-10" duration="0" complete="0" expand="true"/>
+        <task id="14" uid="2080331cf84d467388c9705e536a6d57" name="French Robotics Cup" color="#ff0033" meeting="false" start="2027-05-07" duration="3" complete="0" priority="4" expand="true"/>
+    </tasks>
+    <resources>
+        <resource id="0" name="Maxime Fabre" function="Default:1" contacts="" phone=""/>
+        <resource id="1" name="Thibaut Martin" function="SoftwareDevelopment:2" contacts="" phone=""/>
+        <resource id="2" name="Ryan Guedoir" function="SoftwareDevelopment:2" contacts="" phone=""/>
+        <resource id="3" name="Mickael Borges" function="SoftwareDevelopment:2" contacts="" phone=""/>
+    </resources>
+    <allocations>
+        <allocation task-id="0" resource-id="0" function="Default:1" responsible="true" load="100.0"/>
+        <allocation task-id="9" resource-id="0" function="Default:1" responsible="false" load="100.0"/>
+        <allocation task-id="10" resource-id="0" function="Default:1" responsible="true" load="100.0"/>
+        <allocation task-id="12" resource-id="0" function="Default:1" responsible="true" load="100.0"/>
+        <allocation task-id="1" resource-id="1" function="SoftwareDevelopment:2" responsible="true" load="100.0"/>
+        <allocation task-id="9" resource-id="1" function="SoftwareDevelopment:2" responsible="false" load="100.0"/>
+        <allocation task-id="10" resource-id="1" function="SoftwareDevelopment:2" responsible="false" load="100.0"/>
+        <allocation task-id="1" resource-id="2" function="SoftwareDevelopment:2" responsible="true" load="100.0"/>
+        <allocation task-id="4" resource-id="2" function="SoftwareDevelopment:2" responsible="true" load="100.0"/>
+        <allocation task-id="9" resource-id="2" function="SoftwareDevelopment:2" responsible="false" load="100.0"/>
+        <allocation task-id="10" resource-id="2" function="SoftwareDevelopment:2" responsible="false" load="100.0"/>
+        <allocation task-id="0" resource-id="3" function="SoftwareDevelopment:2" responsible="true" load="100.0"/>
+        <allocation task-id="9" resource-id="3" function="SoftwareDevelopment:2" responsible="true" load="100.0"/>
+        <allocation task-id="10" resource-id="3" function="SoftwareDevelopment:2" responsible="false" load="100.0"/>
+        <allocation task-id="14" resource-id="3" function="SoftwareDevelopment:2" responsible="true" load="100.0"/>
+    </allocations>
+    <vacations/>
+    <previous/>
+    <roles roleset-name="Default"/>
+</project>

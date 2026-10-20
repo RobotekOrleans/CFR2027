@@ -1,0 +1,261 @@
+\documentclass{article}
+\usepackage{graphicx} % Pour insérer des images
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{multirow}
+\usepackage{float} % Pour forcer l'emplacement des images avec [H]
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstdefinelanguage{Arduino}{
+  language=C++,
+  morekeywords={pinMode, digitalWrite, digitalRead, analogRead, analogWrite, delay, setup, loop},
+  morecomment=[l]{//},
+  morestring=[b]",
+}
+
+\lstset{
+  language=Arduino,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{orange},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=5pt,
+  backgroundcolor=\color{white},
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  frame=single,
+  breaklines=true,
+  captionpos=b,
+  tabsize=2,
+}
+
+% Définition des marges
+\geometry{top=1.5cm, bottom=3.5cm, left=3cm, right=3cm}
+
+\pagestyle{fancy}
+\setlength{\headheight}{2cm}
+\fancyhf{}
+
+\fancyhead[L]{\raisebox{-0.5cm}{\includegraphics[height=1.5cm]{Polytech orleans.jpg}}}
+\fancyhead[R]{\raisebox{-0.5cm}{\includegraphics[height=1.5cm]{Universite orleans.png}}}
+
+\fancyfoot[L]{\small Maxime Fabre \& Thibaut Martin \& Ryan Guedouir \& Mickaël Borges}
+\fancyfoot[R]{\small Page \thepage\ / 6}
+\renewcommand{\footrulewidth}{0.4pt}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\begin{document}
+
+    \begin{titlepage}
+    \centering
+    \vspace*{-2cm}
+    \includegraphics[width=10cm]{Polytech orleans.jpg} \hspace{2cm}
+    \includegraphics[width=10cm]{Universite orleans.png}
+
+    \vspace{1.5cm}
+
+    {\Large \textbf{École d'ingénieurs Polytech Orléans}}\\[0.3cm]
+    {\Large \textbf{GPSE - Génie Physique et Systèmes Embarqués}}\\
+
+    \vfill
+
+    {\Huge \textbf{Rapport d'avancement équipe 1}}\\[0.5cm]
+    \rule{\linewidth}{1mm} \\[0.4cm]
+
+    \vfill
+
+    \textbf{\Large Made by :}\\[0.3cm]
+    {\Large Maxime Fabre \& Thibaut Martin \& Ryan Guedouir \& Mickaël Borges} \\[0.3cm]
+
+    \vspace{1cm}
+
+    \textbf{\Large Surrounded by :}\\[0.3cm]
+    {\Large Corentin BUNEL}
+
+    \vfill
+
+    {\Large Année universitaire 2026 - 2027}
+
+    \end{titlepage}
+
+    \tableofcontents
+
+\newpage
+
+\section*{Introduction}
+
+The project is the French Robotics Cup 2027; the goal is to make a robot to participate in the competition.
+The project was proposed by Robotek Orléans.
+This first report concentrates on the start of the project and project management.
+
+\section{French Robotics Cup 2027}
+
+The French Robotics Cup (CFR) is an annual competition that takes place in May. For 2027, the competition starts on May 5th and ends on May 9th. The competition is organized by Eurobot. Each year, the competition has a different theme; this year's theme is Kaamelott, and the different tasks are inspired by it. The competition consists of matches between two different teams, with a match duration of 100 seconds. The duel takes place in an area designed by Eurobot, which is available in the first appendix. To participate in the competition, the robot needs to pass the homologation phase. The goal of this phase is to ensure that the robot is not dangerous for the team or the opponents. The rulebook gives a different number of points depending on the tasks completed by the robot.
+
+This year, the first task is to make a castle with towers and walls to protect the Grail. The second task is to attack the opponent's castle with the balls provided by the organizers. For more details, please see the second appendix.
+
+\section{User case table}
+
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Scenario} & \textbf{Step} \\ \hline
+\multirow{3}{*}{Start of the match} 
+    & 1) Put the robot in the battle area \\ \cline{2-2}
+    & 2) Put the balls inside the robot \\ \cline{2-2}
+    & 3) Start the robot \\ \hline
+\multirow{4}{*}{Creation of the walls} 
+    & 1) Move forward to the location of the crates \\ \cline{2-2}
+    & 2) Collect the crates \\ \cline{2-2}
+    & 3) Move around until the location of the walls \\ \cline{2-2}
+    & 4) Deposit the crates \\ \hline
+\multirow{4}{*}{Creating Towers} 
+    & 1) Move forward to the location of the crates \\ \cline{2-2}
+    & 2) Return a crate \\ \cline{2-2}
+    & 3) Move to the location of the towers \\ \cline{2-2}
+    & 4) Deposit the cash register \\ \hline
+\multirow{2}{*}{Ball shooting} 
+    & 1) Move forward to the location of the crates \\ \cline{2-2}
+    & 2) Throw the ball \\ \hline
+\multirow{5}{*}{Reload} 
+    & 1) Stop the robot \\ \cline{2-2}
+    & 2) Take the power cell \\ \cline{2-2}
+    & 3) Connect the power loader \\ \cline{2-2}
+    & 4) Activate the generator \\ \cline{2-2}
+    & 5) Turn on the power loader \\ \hline
+\multirow{3}{*}{Reusability} 
+    & 1) Put away the robot \\ \cline{2-2}
+    & 2) Dismantle the robot \\ \cline{2-2}
+    & 3) Take the different components \\ \hline
+\end{tabular}
+
+\newpage
+
+\section{Functional analysis}
+
+\subsection{Operational entities}
+
+The robot encounters different entities like the other robots, the blocks, or the secondary robot named PAMI. The robot needs to interact with or avoid the different obstacles.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{OAB.png}
+    \caption{OAB diagram}
+    \label{OAB diagram}
+\end{figure}
+
+\newpage
+
+\subsection{Mission and capabilities}
+
+The robot has different capabilities, such as being autonomous or avoiding other robots.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{MCD.png}
+    \caption{MCB diagram}
+    \label{MCB diagram}
+\end{figure}
+
+\newpage
+
+\subsection{Internal structure}
+
+The robot is made of different parts like the base for the motors and movement, or the obstacle avoidance system.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{SAB.png}
+    \caption{SAB Diagram}
+    \label{SAB Diagram}
+\end{figure}
+
+\subsection{Listing of functions}
+
+The different diagrams allowed us to create this list of functions:
+
+\begin{table}[H]
+\centering
+\tiny
+\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|}
+\hline
+\textbf{ID} & \textbf{Name} & \textbf{Description} & \textbf{Component} & \textbf{Tech.} & \textbf{Input} & \textbf{Output} & \textbf{Criterion} & \textbf{Value} & \textbf{Tol.} & \textbf{Prio.} \\ \hline
+\multirow{4}{*}{FP1} & \multirow{4}{*}{Move} & \multirow{4}{*}{Move autonomously} 
+    & Microcontroller & C++ & Command & PWM & - & - & - & \multirow{4}{*}{P1} \\ \cline{4-10}
+    & & & 4 DC motors & Electro. & PWM & Rotation & Speed (rad/s) & 6.25 & $\pm$0.5 & \\ \cline{4-10}
+    & & & 4 Wheels & Mech. & Rotation & Trans. & Speed (m/s) & 0.25 & $\pm$0.1 & \\ \cline{4-10}
+    & & & H-bridge & Power & PWM+12V & 6V voltage & - & - & - & \\ \hline
+\multirow{2}{*}{FP2} & \multirow{2}{*}{Obstacle} & \multirow{2}{*}{Detect obstacle} 
+    & Microcontroller & C++ & Digital & Stop cmd & Reaction time & 10 ms & $\pm$2 ms & \multirow{2}{*}{P1} \\ \cline{4-10}
+    & & & Ultrasonic sen. & Electro. & Wave & Digital & Distance (cm) & 5 cm & $\pm$2 cm & \\ \hline
+\multirow{2}{*}{FP3} & \multirow{2}{*}{Power} & \multirow{2}{*}{Self-powered} 
+    & Battery & Power & Energy & 12V/5V & Operating time & Min 200s & - & \multirow{2}{*}{P1} \\ \cline{4-10}
+    & & & - & - & - & - & Capacity (mAh) & Min 3000 & - & \\ \hline
+\multirow{2}{*}{FP4} & \multirow{2}{*}{Locate} & \multirow{2}{*}{Read QR/Tags} 
+    & Microcontroller & Python & Read cmd & - & - & - & - & \multirow{2}{*}{P1} \\ \cline{4-10}
+    & & & Camera & Optical & - & Pixels & Reading dist. & 100 cm & $\pm$10 & \\ \hline
+\multirow{3}{*}{FP5} & \multirow{3}{*}{Blocks} & \multirow{3}{*}{Move \& rotate} 
+    & Microcontroller & Python & / & PWM & - & - & - & \multirow{3}{*}{P2} \\ \cline{4-10}
+    & & & Servomotors & Electro. & PWM & Rotation & Rotation ($^\circ$) & 180$^\circ$ & $\pm$5$^\circ$ & \\ \cline{4-10}
+    & & & Pneumatic mod. & Pneum. & Electric & Linear & Pressure (bar) & - & - & \\ \hline
+\multirow{2}{*}{FP6} & \multirow{2}{*}{Shoot} & \multirow{2}{*}{Shoot balls} 
+    & Microcontroller & Python & Shoot cmd & PWM & - & - & - & \multirow{2}{*}{P2} \\ \cline{4-10}
+    & & & Motor & Electro. & PWM & Rotation & Speed (rad/s) & 150 & $\pm$10 & \\ \hline
+\multirow{2}{*}{FP7} & \multirow{2}{*}{Grail} & \multirow{2}{*}{Elevate Grail} 
+    & Microcontroller & Python & Lift cmd & PWM & - & - & - & \multirow{2}{*}{P2} \\ \cline{4-10}
+    & & & Servomotors & Electro. & PWM & Rotation & Height (mm) & 350 & $\pm$50 & \\ \hline
+\multirow{1}{*}{FC1} & \multirow{1}{*}{E-Stop} & \multirow{1}{*}{Emergency stop} 
+    & Push button & Interrup. & Physical & Power cut & Stop time & Max 500ms & - & P1 \\ \hline
+\multirow{2}{*}{FC2} & \multirow{2}{*}{Dimensions} & \multirow{2}{*}{Respect size} 
+    & Undeployed dim. & / & - & - & Perimeter (mm) & Max 1200 & - & \multirow{2}{*}{P1} \\ \cline{4-10}
+    & & & Deployed dim. & / & - & - & Perimeter (mm) & Max 1400 & - & \\ \hline
+\end{tabular}
+\caption{Listing of functions and technical specifications}
+\label{tab:functions}
+\end{table}
+
+\newpage
+
+\section{Planning}
+
+To establish our schedule, we used GanttProject, which proved very helpful for planning the different project steps and distributing tasks.
+
+To distribute tasks efficiently, we first identified what each member preferred not to do. Afterward, we assigned specific domains of activity based on everyone's preferences:
+
+\begin{itemize}
+    \item \textbf{Maxime Fabre} focused on the robot's vision system for obstacle detection and localization.
+    \item \textbf{Rayan Guedouir} managed the power system, ensuring monitoring of the energy stored inside the robot.
+    \item \textbf{Thibaut Martin} worked on the mechanical structure and movement systems.
+    \item \textbf{Mickaël Borges} focused on the actuators.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{Project gestion_CFR2027.png}
+    \caption{Gantt Project Schedule}
+    \label{fig:gantt_schedule}
+\end{figure}
+
+\section{Personal feedback}
+
+\subsection{Maxime Fabre}
+% Add personal notes here
+
+\subsection{Thibaut Martin}
+% Add personal notes here
+
+\subsection{Rayan Guedouir}
+% Add personal notes here
+
+\subsection{Mickaël Borges}
+% Add personal notes here
+
+\end{document}
