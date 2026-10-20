@@ -1,26 +1,30 @@
-Project Name / Robotics Cup 2026
-About
+# French Robotics Cup - Robotek Orléans
 
-This project was proposed by Robotek Orléans with the goal of designing and building an autonomous robot to participate in the French Robotics Cup (Coupe de France de Robotique), organized under Eurobot regulations.
+## About
 
-The organizers grant total freedom regarding the mechanical structure and actuation systems of the robot. The primary constraints are adhering to the official rulebook (règlement) and successfully passing the homologation phase.
-The Robot
+This project was initiated by **Robotek Orléans** to design and build an autonomous robot for the **French Robotics Cup** (Coupe de France de Robotique), organized under the Eurobot framework. 
 
-The robot features a square-shaped base.
+The goal of the competition is to build a fully autonomous robot capable of completing specific tasks defined in the official rules. The organizers allow complete freedom regarding the robot's structure, mechanical design, and actuators. The main requirement is to successfully pass the **homologation phase** by adhering strictly to the official competition regulations.
 
-    (Image of the 3D model of the robot)
+---
 
-Getting Started
+## The Robot
 
-To power on the robot, simply plug in the main battery, and the system will boot up automatically.
-Repository Structure
+The robot relies on a square-shaped base chassis.
 
-The repository is organized by categories as follows:
+*(Insert 3D Model / Image here)*
 
-    regulation-file/ — Official rules, documentation, and files provided by the organizers of the French Robotics Cup.
+### Getting Started
+1. Connect the battery to the main power connector.
+2. The robot will start up automatically.
 
-    project-management/ — Information, planning, and documentation regarding project management.
+---
 
-    software/ — Source code, algorithms, and software architecture.
+## Repository Structure
 
-    hardware/ — CAD files, schematics, and hardware documentation.
+The project files are categorized as follows:
+
+* **`regulation-file/`** — Rules, documentation, and resources provided by the Eurobot / French Robotics Cup organizers.
+* **`project-management/`** — Project tracking, planning, and management resources.
+* **`software/`** — Embedded code, control algorithms, software architecture, and setup guides.
+* **`hardware/`** — CAD models, 3D printing files, PCB designs, and electrical schematics.
