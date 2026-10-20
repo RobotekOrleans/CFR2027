@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><project name="Untitled Gantt Project" company="" webLink="http://" view-date="2026-08-01" view-index="0" gantt-divider-location="351" resource-divider-location="300" version="3.3.3316" locale="fr_FR">
+<?xml version="1.0" encoding="UTF-8"?><project name="Untitled Gantt Project" company="" webLink="http://" view-date="2026-06-01" view-index="0" gantt-divider-location="351" resource-divider-location="300" version="3.3.3316" locale="fr_FR">
     <description/>
     <view zooming-state="default:9" id="gantt-chart">
         <field id="tpd3" name="Nom" width="200" order="0"/>
@@ -9,7 +9,7 @@
         <option id="filter.dueTodayTasks" value="false"/>
         <option id="filter.overdueTasks" value="false"/>
         <option id="filter.inProgressTodayTasks" value="false"/>
-        <timeline><![CDATA[8,14,2,7,5,6]]></timeline>
+        <timeline><![CDATA[7,6,5,14,2,8]]></timeline>
         <option id="color.recent"><![CDATA[#ffcc00 #ff0033 #660000]]></option>
     </view>
     <view id="resource-table">
@@ -61,6 +61,29 @@
         </task>
         <task id="10" uid="069a9e14d6b74c9fa9cd8b2bdd9afa1c" name="Construction of the rolling base for Robot P" color="#660000" meeting="false" start="2026-10-06" duration="30" complete="0" expand="true">
             <depend id="11" type="2" difference="0" hardness="Strong"/>
+            <task id="16" uid="97ada78fc47b46908c7cf8b745fb063d" name="robot structure" meeting="false" start="2026-10-06" duration="11" complete="0" expand="true">
+                <depend id="23" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="17" uid="8ee9f942b2dd407a92209a111734106c" name="Programmation du moteur" meeting="false" start="2026-10-06" duration="11" complete="0" expand="true">
+                <depend id="19" type="2" difference="0" hardness="Strong"/>
+                <depend id="23" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="22" uid="d36daf50296241d0a35711e69bbe7ec7" name="stop button" meeting="false" start="2026-10-06" duration="1" complete="0" expand="true">
+                <depend id="23" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="21" uid="927c8dacd9ff47a4ab30cd379c3e74fd" name="Power supply for the rolling base" meeting="false" start="2026-10-30" duration="1" complete="0" expand="true">
+                <depend id="23" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="19" uid="c9b21a35459842609330bb5380f1c8a8" name="Program the sensor" meeting="false" start="2026-10-21" duration="1" complete="0" expand="true">
+                <depend id="18" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="18" uid="535225d718744e2aaa37e5251c5f34f3" name="PCB of sensor" meeting="false" start="2026-10-22" duration="7" complete="0" expand="true">
+                <depend id="23" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="23" uid="152348d2ccf846248a4d751cfd1175d0" name="Assemblage" meeting="false" start="2026-11-02" duration="6" complete="0" expand="true">
+                <depend id="20" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="20" uid="66f03f19bdcc4df1a0aa86dc21d1eb37" name="homologation blank" meeting="false" start="2026-11-10" duration="5" complete="0" expand="true"/>
         </task>
         <task id="11" uid="40f287fad0dd4f1dbe0c809d2c45de88" name="PowerPoint" color="#ffcc00" meeting="false" start="2026-11-17" duration="3" complete="0" expand="true">
             <depend id="5" type="2" difference="0" hardness="Strong"/>
@@ -72,6 +95,7 @@
         <task id="12" uid="2b7fad48b5124110b5e2b0ffafb0ddcd" name="Perform the robot observation" color="#660000" meeting="false" start="2026-11-20" duration="120" complete="0" expand="true">
             <depend id="14" type="2" difference="0" hardness="Strong"/>
         </task>
+        <task id="24" uid="9433c29228c34b96a3cec5400c5f0d0e" name="List of components to buy" meeting="false" start="2026-11-20" duration="12" complete="0" expand="false"/>
         <task id="13" uid="775a1b5f368d4a65a3d041c496717f32" name="Carry out the task of building walls" color="#660000" meeting="false" start="2026-11-20" duration="35" complete="0" expand="true">
             <depend id="6" type="2" difference="0" hardness="Strong"/>
             <depend id="14" type="2" difference="0" hardness="Strong"/>
@@ -99,17 +123,31 @@
         <allocation task-id="9" resource-id="0" function="Default:1" responsible="false" load="100.0"/>
         <allocation task-id="10" resource-id="0" function="Default:1" responsible="true" load="100.0"/>
         <allocation task-id="12" resource-id="0" function="Default:1" responsible="true" load="100.0"/>
+        <allocation task-id="17" resource-id="0" function="Default:1" responsible="false" load="100.0"/>
+        <allocation task-id="19" resource-id="0" function="Default:1" responsible="false" load="100.0"/>
+        <allocation task-id="23" resource-id="0" function="Default:1" responsible="false" load="100.0"/>
+        <allocation task-id="20" resource-id="0" function="Default:1" responsible="false" load="100.0"/>
         <allocation task-id="1" resource-id="1" function="SoftwareDevelopment:2" responsible="true" load="100.0"/>
         <allocation task-id="9" resource-id="1" function="SoftwareDevelopment:2" responsible="false" load="100.0"/>
         <allocation task-id="10" resource-id="1" function="SoftwareDevelopment:2" responsible="false" load="100.0"/>
+        <allocation task-id="16" resource-id="1" function="SoftwareDevelopment:2" responsible="false" load="100.0"/>
+        <allocation task-id="23" resource-id="1" function="SoftwareDevelopment:2" responsible="false" load="100.0"/>
+        <allocation task-id="20" resource-id="1" function="SoftwareDevelopment:2" responsible="false" load="100.0"/>
         <allocation task-id="1" resource-id="2" function="SoftwareDevelopment:2" responsible="true" load="100.0"/>
         <allocation task-id="4" resource-id="2" function="SoftwareDevelopment:2" responsible="true" load="100.0"/>
         <allocation task-id="9" resource-id="2" function="SoftwareDevelopment:2" responsible="false" load="100.0"/>
         <allocation task-id="10" resource-id="2" function="SoftwareDevelopment:2" responsible="false" load="100.0"/>
+        <allocation task-id="21" resource-id="2" function="SoftwareDevelopment:2" responsible="false" load="100.0"/>
+        <allocation task-id="23" resource-id="2" function="SoftwareDevelopment:2" responsible="false" load="100.0"/>
+        <allocation task-id="20" resource-id="2" function="SoftwareDevelopment:2" responsible="false" load="100.0"/>
         <allocation task-id="0" resource-id="3" function="SoftwareDevelopment:2" responsible="true" load="100.0"/>
         <allocation task-id="9" resource-id="3" function="SoftwareDevelopment:2" responsible="true" load="100.0"/>
         <allocation task-id="10" resource-id="3" function="SoftwareDevelopment:2" responsible="false" load="100.0"/>
         <allocation task-id="14" resource-id="3" function="SoftwareDevelopment:2" responsible="true" load="100.0"/>
+        <allocation task-id="22" resource-id="3" function="SoftwareDevelopment:2" responsible="false" load="100.0"/>
+        <allocation task-id="18" resource-id="3" function="SoftwareDevelopment:2" responsible="false" load="100.0"/>
+        <allocation task-id="23" resource-id="3" function="SoftwareDevelopment:2" responsible="false" load="100.0"/>
+        <allocation task-id="20" resource-id="3" function="SoftwareDevelopment:2" responsible="false" load="100.0"/>
     </allocations>
     <vacations/>
     <previous/>
