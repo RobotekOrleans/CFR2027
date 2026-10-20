@@ -5,7 +5,7 @@ Ce Folder présente les avancées du projet sur la partie mécanique et électri
 
 ## Getting Started
 
-Pour nous aider vous pouvez consulté les tâches à effectuer, en cours et effectuées depuis l'onglet request
+Pour nous aider vous pouvez consulté les tâches à effectuer, en cours et effectuées depuis l'onglet Issues
 
 ## Sommaire
 [Voici les régles la CFR de l'année 2027](https://github.com/RobotekOrleans/CFR2027/tree/main/Regulations%20file).
