@@ -16,20 +16,18 @@ Various diagrams were constructed to structure the design workflow, identify key
 * **Operational Architecture Blank (OAB)** — *Created by Thibaut Martin*
   Identifies external entities, environment actors, and operational capabilities interacting with the robot.
   
-  *(Insert OAB Image Here)*
+  ![OAB](./functional%20analysis/Capella/[OAB]%20Operational%20Entities.jpg)
 
 * **Missions Capabilities Blank (MCB)** — *Created by Mickaël Borges*
   Outlines the high-level missions required for the competition alongside the functional capabilities needed to achieve them.
   
-  *(Insert MCB Image Here)*
+  ![MCB](./functional%20analysis/Capella/[MCB]%20Capabilities.jpg)
 
-* **Physical Architecture Blank (PAB)** — *Created by Maxime Fabre*
+* **Structue Architecture Blank (SAB)** — *Created by Maxime Fabre*
   Defines how physical components implement the required functional capabilities.
   
-  *(Insert PAB Image Here)*
+  ![SAB](./functional%20analysis/Capella/[SAB]%20Structure.jpg)
 
-Additionally, a comprehensive summary table prioritizing task execution based on system requirements was compiled by Maxime Fabre.
-* **File Location:** `[Insert Table File Path]`
 
 ---
 
@@ -39,7 +37,7 @@ Additionally, a comprehensive summary table prioritizing task execution based on
 
 The functional analysis provided the necessary technical requirements to select hardware components. Comparative studies were conducted to determine the optimal trade-off between performance, cost, and availability.
 
-* Detailed component evaluations can be found in `[Insert Component List File Name]`.
+* Detailed component evaluations can be found in [list of componant](./Planned%20budget/Dépenses.xlsx).
 * The overall budget accounts for:
   * Newly purchased hardware and components.
   * 3D printing filament consumption.
@@ -59,7 +57,7 @@ A proactive risk analysis was conducted using the **FMEA (Failure Mode and Effec
 * **Primary Critical Risk Identified:** Failing the official competition homologation process.
 * **Mitigation Strategy:** Implementation of a strict internal pre-homologation checkpoint prior to the competition.
 
-Detailed risk metrics and action plans are documented in `[Insert Risk Analysis File Name]`.
+Detailed risk metrics and action plans are documented in [AMDEC](./AMDEC.xlsx).
 
 ---
 
@@ -69,7 +67,7 @@ Project timelines, task dependencies, and milestones were structured using a Gan
 
 *(Insert Gantt Chart Image Here)*
 
-* **File Location:** `[Insert Folder/File Path]`
+* **File Location:** [Gantt](./Planning/Gantt.gan)
 * **Resource Allocation:** Each task within the Gantt chart is explicitly assigned to a designated team member to ensure accountability.
 
 ---
@@ -85,4 +83,4 @@ The Project Specifications document establishes the official technical baseline 
 3. **Performance Metrics:** Speed, positioning accuracy, navigation reliability, and power autonomy specifications.
 4. **Constraint Tracking:** Boundaries for total mass, maximum power consumption, and manufacturing budget constraints.
 
-* **File Location:** `[Insert Specification Document Name/Path]`
+* **File Location:** [functional specification](./functional%20analysis/Functional_specification.ods)
