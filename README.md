@@ -10,7 +10,7 @@ This project was initiated by Robotek Orléans to design and build an autonomous
 
 
 
-The goal of the competition is to build a fully autonomous robot capable of performing specific tasks defined in the official rules. The organizers grant complete freedom regarding the robot's structure, mechanical design, and actuation systems. The primary requirement is to successfully pass the homologation phase by adhering strictly to the official competition regulations.
+The goal of the project is to participate at the eurobot competition, for that we need to build a fully autonomous robot capable of performing specific tasks defined in the official rules. The organizers grant complete freedom regarding the robot's structure, mechanical design, and actuation systems. The first requirement is to successfully pass the homologation phase by adhering strictly to the official competition regulations.
 
 
 
@@ -58,7 +58,7 @@ The project files are structured as follows:
 
 - [regulation-file](./Regulations%20file/) — Rules, documentation, and resources provided by the Eurobot / French Robotics Cup organizers.
 
-- [Project gestion](./Project%20gestion/) — Project tracking, planning, risk analysis, and management resources.
+- [Project management](./Project%20management/) — Project tracking, planning, risk analysis, and management resources.
 
 - [Software](./Software/) — Embedded source code, control algorithms, software architecture, and setup guides.
 
