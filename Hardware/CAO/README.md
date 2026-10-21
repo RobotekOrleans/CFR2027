@@ -6,7 +6,7 @@ This section contains all 3D CAD modeling files for the robot's mechanical compo
 
 ### Directory Structure
 
-* **`full-assembly/`** *(or `nom/`)* — Contains the complete 3D assembly model of the robot.
+* **`full-assembly/`** *(or `name/`)* — Contains the complete 3D assembly model of the robot.
 * **Subfolders** — Dedicated directories for each individual mechanical component and subsystem.
 
 ### 3D Printing Setup
@@ -17,7 +17,7 @@ The association uses a **Bambu Lab X1 Carbon** 3D printer. The main materials us
 
 ## Components
 
-### Pillars / Standoffs (`poteaux/`)
+### Standoffs (`Standoffs/`)
 
 The robot structure relies on 4 main pillars, held together by threaded rods running through their center. Custom PLA pillars were 3D printed to distribute the structural load across a larger surface area compared to the threaded rods alone.
 
@@ -27,7 +27,7 @@ The robot structure relies on 4 main pillars, held together by threaded rods run
 
 ---
 
-### Motor Mounts (`support-moteur/`)
+### Motor Mounts (`Motor_support/`)
 
 The robot is driven by 4 motors. Custom PLA mounting brackets were designed and 3D printed to secure the motors to the frame.
 
