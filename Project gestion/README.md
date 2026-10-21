@@ -65,7 +65,7 @@ Detailed risk metrics and action plans are documented in [AMDEC](./AMDEC.xlsx).
 **Contributors:** Mickaël Borges
 Project timelines, task dependencies, and milestones were structured using a Gantt chart created with **GanttProject** (by Bar political / ADAE).
 
-*(Insert Gantt Chart Image Here)*
+![Gantt](./Planning/)
 
 * **File Location:** [Gantt](./Planning/Gantt.gan)
 * **Resource Allocation:** Each task within the Gantt chart is explicitly assigned to a designated team member to ensure accountability.
