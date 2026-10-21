@@ -4,6 +4,8 @@ This directory contains the robot's software:
 * The **ESP32 WROOM32** code, controlling the drivetrain and handling sensor data acquisition.
 * The **Raspberry Pi 4** code, managing robot localization in the arena and controlling actuators.
 
+<img width="1920" height="1080" alt="ESP32 WROOM 32" src="https://github.com/user-attachments/assets/9ba4a6e2-d584-46af-a106-8fa595794fa7" />
+
 ---
 
 ## ESP32 Code Architecture

@@ -8,7 +8,7 @@
 
 This section contains all 3D CAD modeling files for the robot's mechanical components. 3D modeling allows us to visualize the design clearly, check for potential mechanical constraints, and identify any assembly issues prior to manufacturing.
 
-
+![WIP Full Assembly](./full-assembly/(WIP)%20full%20assembly.png)
 
 - Final Design: Thibaut Martin & Mickaël Borges
 
@@ -50,6 +50,7 @@ This section contains all 3D CAD modeling files for the robot's mechanical compo
 
 The robot structure relies on 4 main pillars, held together by threaded rods running through their center. Custom PLA pillars were 3D printed to distribute the structural load across a larger surface area compared to the threaded rods alone.
 
+![Standoffs](./Standoffs/Standoffs.png)
 
 
 - Designer: Mickaël Borges
@@ -72,6 +73,7 @@ The robot structure relies on 4 main pillars, held together by threaded rods run
 
 The robot is driven by 4 motors. Custom PLA mounting brackets were designed and 3D printed to secure the motors to the frame.
 
+![Motor support](./Motor_support/Motor_support.png)
 
 
 - Designer: Mickaël Borges
@@ -116,7 +118,7 @@ The robot uses 4 vacuum/air pumps. Dedicated mounting brackets were 3D printed t
 
 The robot is powered by an 11.1V, 4300 mAh LiPo battery mandated by the association. A custom 3D-printed bracket was designed to securely mount and fix the battery onto the robot frame.
 
-
+![Battery holder](./battery-holder/Battery-holder.png)
 
 - Designer: Mickaël Borges
 
@@ -124,4 +126,4 @@ The robot is powered by an 11.1V, 4300 mAh LiPo battery mandated by the associat
 
 - Material: PLA
 
-- Filament Used: N/A (To be determined)
+- Filament Used: ~60.01g
