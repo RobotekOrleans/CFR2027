@@ -10,6 +10,8 @@ This directory contains the robot's software:
 
 The software relies on **FreeRTOS** and utilizes both cores of the ESP32 to ensure real-time execution:
 
+<img width="1920" height="1080" alt="ESP32 WROOM 32" src="https://github.com/user-attachments/assets/7c321953-2c6f-425f-b1b5-4996f59b1fd0" />
+
 * **Core 0 — `ThreadComRasbe`:**
   * **UART Communication:** Receiving and parsing commands from the Raspberry Pi (`readSerialData()`, `parseData()`).
   * **Ultrasonic Sensors:** Managing 4 sensors via interrupts (`IRAM_ATTR echoInterrupt()`, `declencherPing()`, `traiterUltrason()`).
