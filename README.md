@@ -58,7 +58,7 @@ The project files are structured as follows:
 
 - [regulation-file](./Regulations%20file/) — Rules, documentation, and resources provided by the Eurobot / French Robotics Cup organizers.
 
-- [Project gestion](./Project%20gestion/) — Project tracking, planning, risk analysis, and management resources.
+- [Project management](./Project%20management/) — Project tracking, planning, risk analysis, and management resources.
 
 - [Software](./Software/) — Embedded source code, control algorithms, software architecture, and setup guides.
 
