@@ -124,4 +124,4 @@ The robot is powered by an 11.1V, 4300 mAh LiPo battery mandated by the associat
 
 - Material: PLA
 
-- Filament Used: N/A (To be determined)
+- Filament Used: ~60.01g
