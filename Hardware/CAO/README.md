@@ -103,3 +103,25 @@ The robot uses 4 vacuum/air pumps. Dedicated mounting brackets were 3D printed t
 - Material: PLA
 
 - Filament Used: N/A (To be determined)
+
+
+
+---
+
+
+
+### Battery Holder (battery-holder/)
+
+
+
+The robot is powered by an 11.1V, 4300 mAh LiPo battery mandated by the association. A custom 3D-printed bracket was designed to securely mount and fix the battery onto the robot frame.
+
+
+
+- Designer: Mickaël Borges
+
+- Location: battery-holder/
+
+- Material: PLA
+
+- Filament Used: N/A (To be determined)
