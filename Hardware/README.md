@@ -27,7 +27,7 @@ The Hardware repository is organized into three main categories:
 
 
 
-### 1. Mechanical Assembly (mechanical/)
+### 1. Mechanical Assembly ([mechanical](./mechanical/) )
 
 Contains images and descriptions of the physical assembly, along with material selections and technical justifications for the structural design choices.
 
@@ -35,7 +35,7 @@ Contains images and descriptions of the physical assembly, along with material s
 
 
 
-### 2. CAD & 3D Modeling (cad/)
+### 2. CAD & 3D Modeling ([CAD](./cad/) )
 
 Contains 3D assembly models and printable components. 3D modeling enables rapid prototyping of complex geometries with adaptable strength based on material choice and infill settings.
 
@@ -43,7 +43,7 @@ Contains 3D assembly models and printable components. 3D modeling enables rapid 
 
 
 
-### 3. Electronics & Schematics (electronics/)
+### 3. Electronics & Schematics (([electronics](./electronics/) ))
 
 Contains electrical schematics, wiring diagrams for the mobile base and actuators, as well as custom PCB layout files.
 
