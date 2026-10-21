@@ -1,21 +1,49 @@
-# About
-
-Ce Folder présente les avancées du projet sur la partie mécanique et électrique. Cette partie s'inscrit dans le projet **CFR 2027** en collaboration avec _Robotek Orléans_ et _Polytech Orléans_.
+# Hardware - Robotek Orléans
 
 
-## Getting Started
 
-Pour nous aider vous pouvez consulté les tâches à effectuer, en cours et effectuées depuis l'onglet Issues
+## About
 
-## Sommaire
-[Voici les régles la CFR de l'année 2027](https://github.com/RobotekOrleans/CFR2027/tree/main/Regulations%20file).
 
-Vous trouverez les composants disponibles et les dépenses lié au projet [ici](https://github.com/RobotekOrleans/CFR2027/blob/main/Project%20gestion/Dépenses.xlsx)
 
-Pour tout autres informations concernant la gestion du projet veuillez cliquer [ici](https://github.com/RobotekOrleans/CFR2027/tree/main/Project%20gestion)
+This directory contains the complete hardware development files for the robot, covering its full mechanical structure, electrical schematics, and design decisions.
 
-Les schémas électriques des pompes et des moteurs sont trouvable [ici](https://github.com/RobotekOrleans/CFR2027/tree/main/Hardware/Electrical%20schematic)
 
-Les différents éléments modéliser en 3D sont dans [ce dossier](https://github.com/RobotekOrleans/CFR2027/tree/main/Hardware/CAO)
 
-Le PCB à réaliser est [celui-ci](https://github.com/RobotekOrleans/CFR2027/tree/main/Hardware/PCB)
+- Hardware Team Lead: Thibaut Martin
+
+
+
+---
+
+
+
+## Directory Structure
+
+
+
+The Hardware repository is organized into three main categories:
+
+
+
+### 1. Mechanical Assembly (mechanical/)
+
+Contains images and descriptions of the physical assembly, along with material selections and technical justifications for the structural design choices.
+
+- Section Lead: Thibaut Martin
+
+
+
+### 2. CAD & 3D Modeling (cad/)
+
+Contains 3D assembly models and printable components. 3D modeling enables rapid prototyping of complex geometries with adaptable strength based on material choice and infill settings.
+
+- Section Lead: Mickaël Borges
+
+
+
+### 3. Electronics & Schematics (electronics/)
+
+Contains electrical schematics, wiring diagrams for the mobile base and actuators, as well as custom PCB layout files.
+
+- Section Lead: Ryan Gedoir
