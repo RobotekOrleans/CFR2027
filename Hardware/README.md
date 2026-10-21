@@ -5,7 +5,6 @@
 ## About
 
 
-
 This directory contains the complete hardware development files for the robot, covering its full mechanical structure, electrical schematics, and design decisions.
 
 
@@ -16,7 +15,9 @@ This directory contains the complete hardware development files for the robot, c
 
 ---
 
+## Robot
 
+![WIP Full Assembly](./cad/full-assembly/(WIP)%20full%20assembly.png)
 
 ## Directory Structure
 

@@ -30,7 +30,7 @@ The robot features a square-shaped base chassis.
 
 
 
-(Insert 3D Model / Image Here)
+![WIP Full Assembly](./Hardware/cad/full-assembly/(WIP)%20full%20assembly.png)
 
 
 
