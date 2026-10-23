@@ -10,7 +10,7 @@ This project was initiated by Robotek Orléans to design and build an autonomous
 
 
 
-The goal of the competition is to build a fully autonomous robot capable of performing specific tasks defined in the official rules. The organizers grant complete freedom regarding the robot's structure, mechanical design, and actuation systems. The primary requirement is to successfully pass the homologation phase by adhering strictly to the official competition regulations.
+The goal of the project is to participate at the eurobot competition, for that we need to build a fully autonomous robot capable of performing specific tasks defined in the official rules. The organizers grant complete freedom regarding the robot's structure, mechanical design, and actuation systems. The first requirement is to successfully pass the homologation phase by adhering strictly to the official competition regulations.
 
 
 
