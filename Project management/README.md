@@ -28,7 +28,7 @@ Various diagrams were constructed to structure the design workflow, identify key
   
   ![SAB](./functional%20analysis/Capella/[SAB]%20Structure.png)
   
-  * **Physical Architecture Blank (SAB)** — *Created by Maxime Fabre*
+  * **Structure Architecture Blank (SAB)** — *Created by Maxime Fabre*
   Defines the different components we need for doing the different capabilities.
   
   ![PAB](./functional%20analysis/Capella/[PAB]%20Structure.png)
