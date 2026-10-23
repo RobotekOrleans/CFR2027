@@ -16,17 +16,17 @@ Various diagrams were constructed to structure the design workflow, identify key
 * **Operational Architecture Blank (OAB)** — *Created by Thibaut Martin*
   Identifies external entities, environment actors, and operational capabilities interacting with the robot.
   
-  ![OAB](./functional%20analysis/Capella/[OAB]%20Operational%20Entities.jpg)
+  ![OAB](./functional%20analysis/Capella/[OAB]%20Operational%20Entities.png)
 
 * **Missions Capabilities Blank (MCB)** — *Created by Mickaël Borges*
   Outlines the high-level missions required for the competition alongside the functional capabilities needed to achieve them.
   
-  ![MCB](./functional%20analysis/Capella/[MCB]%20Capabilities.jpg)
+  ![MCB](./functional%20analysis/Capella/[MCB]%20Capabilities.png)
 
 * **Structue Architecture Blank (SAB)** — *Created by Maxime Fabre*
   Defines how physical components implement the required functional capabilities.
   
-  ![SAB](./functional%20analysis/Capella/[SAB]%20Structure.jpg)
+  ![SAB](./functional%20analysis/Capella/[SAB]%20Structure.png)
 
 
 ---
