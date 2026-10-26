@@ -1,0 +1,110 @@
+!SESSION 2026-10-23 14:04:22.205 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=21.0.11
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=fr_FR
+Command-line arguments:  -os linux -ws gtk -arch x86_64
+
+!ENTRY org.eclipse.ui.ide 4 0 2026-10-23 14:05:41.871
+!MESSAGE Could not import project located at /home/mickaelborges/Documents/GitHub/CFR2027/Project management/functional analysis/Capella
+!STACK 0
+org.eclipse.ui.internal.wizards.datatransfer.CouldNotImportProjectException: Could not import project located at /home/mickaelborges/Documents/GitHub/CFR2027/Project management/functional analysis/Capella
+	at org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob.toExistingOrNewProject(SmartImportJob.java:565)
+	at org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob.run(SmartImportJob.java:252)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+Caused by: org.eclipse.core.internal.resources.ResourceException: Invalid project description.
+	at org.eclipse.core.internal.resources.Project.checkDescription(Project.java:178)
+	at org.eclipse.core.internal.resources.Project.assertCreateRequirements(Project.java:62)
+	at org.eclipse.core.internal.resources.Project.create(Project.java:272)
+	at org.eclipse.core.internal.resources.Project.create(Project.java:258)
+	at org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob.createOrImportProject(SmartImportJob.java:604)
+	at org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob.toExistingOrNewProject(SmartImportJob.java:552)
+	... 2 more
+
+!ENTRY org.eclipse.ui.ide 4 0 2026-10-23 14:05:59.123
+!MESSAGE Could not import project located at /home/mickaelborges/Documents/GitHub/CFR2027/Project management/functional analysis/Capella
+!STACK 0
+org.eclipse.ui.internal.wizards.datatransfer.CouldNotImportProjectException: Could not import project located at /home/mickaelborges/Documents/GitHub/CFR2027/Project management/functional analysis/Capella
+	at org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob.toExistingOrNewProject(SmartImportJob.java:565)
+	at org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob.run(SmartImportJob.java:252)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+Caused by: org.eclipse.core.internal.resources.ResourceException: Invalid project description.
+	at org.eclipse.core.internal.resources.Project.checkDescription(Project.java:178)
+	at org.eclipse.core.internal.resources.Project.assertCreateRequirements(Project.java:62)
+	at org.eclipse.core.internal.resources.Project.create(Project.java:272)
+	at org.eclipse.core.internal.resources.Project.create(Project.java:258)
+	at org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob.createOrImportProject(SmartImportJob.java:604)
+	at org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob.toExistingOrNewProject(SmartImportJob.java:552)
+	... 2 more
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:31.273
+!MESSAGE Rich text widget can not install beforePaste/afterPaste/beforeCommandExec listeners!
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:31.318
+!MESSAGE Rich text widget cannot install the open link command
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:31.331
+!MESSAGE Rich text widget cannot install the save handler
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:31.348
+!MESSAGE Rich text widget cannot install the notification handler
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:31.358
+!MESSAGE Rich text widget cannot install onChangeEvent handler
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:31.361
+!MESSAGE Rich text widget cannot install resetDirtyState handler
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:31.373
+!MESSAGE Rich text widget cannot install dataReady handler
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:31.374
+!MESSAGE Rich text widget cannot install setData handler
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:40.732
+!MESSAGE Rich text widget can not install beforePaste/afterPaste/beforeCommandExec listeners!
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:40.778
+!MESSAGE Rich text widget cannot install the open link command
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:40.788
+!MESSAGE Rich text widget cannot install the save handler
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:40.811
+!MESSAGE Rich text widget cannot install the notification handler
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:40.812
+!MESSAGE Rich text widget cannot install onChangeEvent handler
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:40.822
+!MESSAGE Rich text widget cannot install resetDirtyState handler
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:40.823
+!MESSAGE Rich text widget cannot install dataReady handler
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:40.832
+!MESSAGE Rich text widget cannot install setData handler
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:42.935
+!MESSAGE Rich text widget can not install beforePaste/afterPaste/beforeCommandExec listeners!
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:42.942
+!MESSAGE Rich text widget cannot install the open link command
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:42.999
+!MESSAGE Rich text widget cannot install the save handler
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:43.011
+!MESSAGE Rich text widget cannot install the notification handler
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:43.033
+!MESSAGE Rich text widget cannot install onChangeEvent handler
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:43.036
+!MESSAGE Rich text widget cannot install resetDirtyState handler
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:43.048
+!MESSAGE Rich text widget cannot install dataReady handler
+
+!ENTRY org.polarsys.kitalpha.richtext.widget 2 0 2026-10-23 14:07:43.050
+!MESSAGE Rich text widget cannot install setData handler
