@@ -8,7 +8,7 @@ const int PIN_PWM[4] = {27, 25, 18, 21};
 const int PIN_DIR[4] = {26, 33, 19, 22};
 
 const char* NOM_MOTEUR[4] = {
-    "Gaucher Avant (GAv)",
+    "Gauche Avant (GAv)",
     "Droit Avant (DAv)",
     "Gauche Arrière (GAr)",
     "Droit Arrière (DAr)"

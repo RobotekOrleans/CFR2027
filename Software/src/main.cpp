@@ -1,6 +1,5 @@
 #include <Arduino.h>
 
-
 //==============Branchements================
 //Liaison UART2 avec Raspberry Pi
 #define RXD2 16
@@ -336,7 +335,7 @@ void setup() {
   // Activation du Standby sur les ponts en H
   pinMode(PIN_STBY, OUTPUT);
   digitalWrite(PIN_STBY, HIGH);
-  
+
   // Initialisation Moteurs & Encodeurs
   for (int i = 0; i < 4; i++) 
   {
