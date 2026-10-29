@@ -1,5 +1,21 @@
 #include <Arduino.h>
 
+
+//==============Branchements================
+//Liaison UART2 avec Raspberry Pi
+#define RXD2 16
+#define TXD2 17
+
+//Moteurs (Ponts en H) & Encodeurs
+#define PIN_STBY 13
+const int PIN_PWM[4] = {27, 25, 18, 21}; // [0]=GAv, [1]=DAv, [2]=GAr, [3]=DAr
+const int PIN_DIR[4] = {26, 33, 19, 22};
+const int PIN_ENC[4] = {4, 14, 32, 15};
+
+//Ultrasons (1 TRIG commun sur GPIO 23 + 4 ECHO sur broches GPI)
+#define NB_CAPTEURS 4
+#define TRIG_PIN_COMMUN 23
+const uint8_t ECHO_PINS[NB_CAPTEURS] = {34, 35, 36, 39};
 //=============Communication avec Rasbery===============
 const byte b_numChars = 32;
 char c_receivedChars[b_numChars];
@@ -12,9 +28,9 @@ void readSerialData() //Lecture de la data envoyé par la rasbery sur la liaison
   char c_EndMarker = '>';   //Marqueur de fin de la transmission
   char c_Data; //Data transmise
 
-  while(Serial.available() > 0 && bol_newData == false)
+  while(Serial2.available() > 0 && bol_newData == false)
   {
-    c_Data = Serial.read();
+    c_Data = Serial2.read();
     if(bol_ReceiveInProgress == true)
     {
       if(c_Data != c_EndMarker)
@@ -115,9 +131,6 @@ void verifierWatchdog() //Watchdog pour arrêter le mouvement si la communicatio
 }
 
 //=============Gestion 4 ultrasons===============
-#define NB_CAPTEURS 4
-const uint8_t TRIG_PINS[NB_CAPTEURS] = {27, 26, 25, 4};
-const uint8_t ECHO_PINS[NB_CAPTEURS] = {32, 33, 34, 35};
 volatile unsigned long echoStart[NB_CAPTEURS] = {0};
 volatile unsigned long echoEnd[NB_CAPTEURS] = {0};
 volatile bool b_echoReceived[NB_CAPTEURS] = {false, false, false, false};
@@ -141,11 +154,11 @@ void IRAM_ATTR echoInterrupt() //Interuption lors que le signal est de retour
 }
 void DeclancherPing()//Envois du signal
 {
-  digitalWrite(TRIG_PINS[currentSensor], LOW);
+  digitalWrite(TRIG_PIN_COMMUN, LOW);
   delayMicroseconds(2);
-  digitalWrite(TRIG_PINS[currentSensor], HIGH);
+  digitalWrite(TRIG_PIN_COMMUN, HIGH);
   delayMicroseconds(10);
-  digitalWrite(TRIG_PINS[currentSensor], LOW);
+  digitalWrite(TRIG_PIN_COMMUN, LOW);
 }
 void traiterUltrason()//Traitement du signal pour obtenir la distance
 {
@@ -185,13 +198,36 @@ void traiterUltrason()//Traitement du signal pour obtenir la distance
 }
 void envoyerTelemetrieUS()//Fonction pour envoyer régulièrement la télémétrie à la RPi
 {
-  Serial.print("<US,");
-  Serial.print(f_distancesUS[0], 1); Serial.print(",");
-  Serial.print(f_distancesUS[1], 1); Serial.print(",");
-  Serial.print(f_distancesUS[2], 1); Serial.print(",");
-  Serial.print(f_distancesUS[3], 1);
-  Serial.println(">");
+  Serial2.print("<US,");
+  Serial2.print(f_distancesUS[0], 1); Serial2.print(",");
+  Serial2.print(f_distancesUS[1], 1); Serial2.print(",");
+  Serial2.print(f_distancesUS[2], 1); Serial2.print(",");
+  Serial2.print(f_distancesUS[3], 1);
+  Serial2.println(">");
 }
+
+//=============Deplacement===============
+//Comptage des Ticks par Interruption
+volatile long tickCounters[4] = {0, 0, 0, 0};
+void IRAM_ATTR Encoder0() { tickCounters[0]++; }
+void IRAM_ATTR Encoder1() { tickCounters[1]++; }
+void IRAM_ATTR Encoder2() { tickCounters[2]++; }
+void IRAM_ATTR Encoder3() { tickCounters[3]++; }
+
+struct MotorPID {
+    float Kp = 1.2;
+    float Ki = 0.05;
+    float Kd = 0.01;
+
+    int targetSpeedTicks = 0; // Consigne en ticks : 20ms
+    long lastTicks = 0;
+    
+    float errorSum = 0;
+    float lastError = 0;
+    
+    int pwmOutput = 0;
+};
+MotorPID pid[4];
 
 //=============Threads===============
 void ThreadComRasbe(void * parameter) //Thread 1 : Communication RPI et gestion ultrasons
@@ -224,33 +260,98 @@ void ThreadComRasbe(void * parameter) //Thread 1 : Communication RPI et gestion 
 void ThreadDeplacement(void * parameter) //Thread 2 : Gestion des moteurs
 {
   int n_consignesMoteurs[4] = {0, 0, 0, 0};
+  TickType_t LastWakeTime = xTaskGetTickCount();
+  const TickType_t Frequency = pdMS_TO_TICKS(20);
+  
   while(1)
   {
     if (xQueueReceive(motorQueue, &n_consignesMoteurs, 0) == pdTRUE) // On regarde si de nouvelles consignes sont arrivées dans la Queue
     {
       // Réception des nouvelles consignes sur le Cœur 1 !
+      for (int i = 0; i <4; i++)
+      {
+        pid[i].targetSpeedTicks = n_consignesMoteurs[i];
+      }
       Serial.print("⚙️ Cœur 1 a reçu les nouvelles consignes : ");
       Serial.print(n_consignesMoteurs[0]); Serial.print(", ");
       Serial.print(n_consignesMoteurs[1]); Serial.print(", ");
       Serial.print(n_consignesMoteurs[2]); Serial.print(", ");
       Serial.println(n_consignesMoteurs[3]);
     }
+    for (int i = 0; i < 4; i++)
+    {
+      // Lecture de la vitesse réelle (ticks mesurés pendant les 20ms)
+      long currentTicks = tickCounters[i];
+      long measuredSpeed = currentTicks - pid[i].lastTicks;
+      pid[i].lastTicks = currentTicks;
 
-    // Implémenter le PID et la gestion des PWM
-    vTaskDelay(10 / portTICK_PERIOD_MS);
+      // Calcul de l'erreur
+      float error = abs(pid[i].targetSpeedTicks) - measuredSpeed;
+
+      // Terme Intégral avec anti-windup
+      pid[i].errorSum += error;
+      pid[i].errorSum = constrain(pid[i].errorSum, -500.0, 500.0);
+
+      // Terme Dérivé
+      float derivative = error - pid[i].lastError;
+      pid[i].lastError = error;
+
+      //Calcul PID
+      float output = (pid[i].Kp * error) + (pid[i].Ki * pid[i].errorSum) + (pid[i].Kd * derivative);
+      pid[i].pwmOutput += (int)output;
+      pid[i].pwmOutput = constrain(pid[i].pwmOutput, 0, 255);
+
+      // Signe du PWM
+      int finalPWM = (pid[i].targetSpeedTicks >= 0) ? pid[i].pwmOutput : -pid[i].pwmOutput;
+      if (pid[i].targetSpeedTicks == 0) 
+      {
+        finalPWM = 0;
+        pid[i].errorSum = 0;
+      }
+
+      // Application matérielle aux ponts en H
+      if (finalPWM >= 0) 
+      {
+      digitalWrite(PIN_DIR[i], HIGH);
+      } 
+      else 
+      {
+        digitalWrite(PIN_DIR[i], LOW);
+        finalPWM = -finalPWM;
+      }
+      analogWrite(PIN_PWM[i], constrain(finalPWM, 0, 255));
+    }
+    vTaskDelayUntil(&LastWakeTime, Frequency);
   }
 }
 
 //=============Setup===============
 void setup() {
   Serial.begin(115200);
-
+  //Communication UART avec Pi
+  Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
   // Création d'une Queue pouvant contenir 1 élément (le tableau de 4 int)
   motorQueue = xQueueCreate(1, sizeof(n_motorSpeeds));
 
+  // Activation du Standby sur les ponts en H
+  pinMode(PIN_STBY, OUTPUT);
+  digitalWrite(PIN_STBY, HIGH);
+  
+  // Initialisation Moteurs & Encodeurs
+  for (int i = 0; i < 4; i++) 
+  {
+    pinMode(PIN_PWM[i], OUTPUT);
+    pinMode(PIN_DIR[i], OUTPUT);
+    pinMode(PIN_ENC[i], INPUT_PULLUP);
+  }
+  attachInterrupt(digitalPinToInterrupt(PIN_ENC[0]), Encoder0, RISING);
+  attachInterrupt(digitalPinToInterrupt(PIN_ENC[1]), Encoder1, RISING);
+  attachInterrupt(digitalPinToInterrupt(PIN_ENC[2]), Encoder2, RISING);
+  attachInterrupt(digitalPinToInterrupt(PIN_ENC[3]), Encoder3, RISING);
+
   // Configuration des broches pour les 4 capteurs & Attachement des interruptions sur les 4 pins ECHO
   for (int i = 0; i < NB_CAPTEURS; i++) {
-    pinMode(TRIG_PINS[i], OUTPUT);
+    pinMode(TRIG_PIN_COMMUN, OUTPUT);
     pinMode(ECHO_PINS[i], INPUT);
     attachInterrupt(digitalPinToInterrupt(ECHO_PINS[i]), echoInterrupt, CHANGE); //Interuption
   }
