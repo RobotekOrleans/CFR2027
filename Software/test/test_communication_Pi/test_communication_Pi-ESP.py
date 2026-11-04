@@ -8,7 +8,7 @@ try:
         baudrate=115200,
         timeout=1
     )
-    print("✅ Port série /dev/serial0 ouvert avec succès à 115200 bauds.")
+    print(" Port série /dev/serial0 ouvert avec succès à 115200 bauds.")
 except Exception as e:
     print(f"❌ Erreur lors de l'ouverture du port série : {e}")
     exit(1)
@@ -46,15 +46,15 @@ def lire_reponse_esp32():
                 try:
                     us1, us2, us3, us4 = [float(x) for x in elements[1:]]
                     print(
-                        f"[RX <- ESP32] 📏 US -> "
+                        f"[RX <- ESP32]  US -> "
                         f"GAv:{us1:.1f}cm | DAv:{us2:.1f}cm | GAr:{us3:.1f}cm | DAr:{us4:.1f}cm"
                     )
                 except ValueError:
-                    print(f"⚠️ Erreur de parsing US : {ligne}")
+                    print(f" Erreur de parsing US : {ligne}")
 
-            # 2. Alerte Arrêt d'Urgence <⚠️,URGENCE, Capteur X>
+            # 2. Alerte Arrêt d'Urgence <,URGENCE, Capteur X>
             elif "URGENCE" in header or "URGENCE" in line_content(elements):
-                print(f"[RX <- ESP32] 🚨 ALERTE OBSTACLE PROCHE : {ligne}")
+                print(f"[RX <- ESP32]  ALERTE OBSTACLE PROCHE : {ligne}")
 
             else:
                 print(f"[RX <- ESP32] Trame inconnue : {ligne}")
