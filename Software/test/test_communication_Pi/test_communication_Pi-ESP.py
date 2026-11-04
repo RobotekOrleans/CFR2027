@@ -4,13 +4,13 @@ import time
 # --- Configuration de la liaison UART0 de la RPi4 (/dev/serial0 sur Pins 8 & 10) ---
 try:
     ser = serial.Serial(
-        port='/dev/serial0',
+        port='/dev/serial0',  # Modifier en '/dev/ttyAMA0' si /dev/serial0 ne répond pas
         baudrate=115200,
         timeout=1
     )
-    print("Port série /dev/serial0 ouvert avec succès à 115200 bauds.")
+    print("✅ Port série /dev/serial0 ouvert avec succès à 115200 bauds.")
 except Exception as e:
-    print(f"Erreur lors de l'ouverture du port série : {e}")
+    print(f"❌ Erreur lors de l'ouverture du port série : {e}")
     exit(1)
 
 
@@ -18,6 +18,7 @@ def envoyer_commande_vitesse(v0, v1, v2, v3):
     """Envoie une consigne de vitesse en ticks/20ms : <V,v0,v1,v2,v3>"""
     trame = f"<V,{v0},{v1},{v2},{v3}>\n"
     ser.write(trame.encode('utf-8'))
+    ser.flush()  # Force l'envoi physique immédiat sur la broche TX
     print(f"[TX -> ESP32] Vitesse (ticks/20ms) : {trame.strip()}")
 
 
@@ -25,6 +26,7 @@ def envoyer_masque_capteurs(i0, i1, i2, i3):
     """Envoie le masque des capteurs US à ignorer (1 = ignorer, 0 = actif) : <I,i0,i1,i2,i3>"""
     trame = f"<I,{i0},{i1},{i2},{i3}>\n"
     ser.write(trame.encode('utf-8'))
+    ser.flush()  # Force l'envoi physique immédiat sur la broche TX
     print(f"[TX -> ESP32] Masque US : {trame.strip()}")
 
 
@@ -48,11 +50,11 @@ def lire_reponse_esp32():
                         f"GAv:{us1:.1f}cm | DAv:{us2:.1f}cm | GAr:{us3:.1f}cm | DAr:{us4:.1f}cm"
                     )
                 except ValueError:
-                    print(f"Erreur de parsing US : {ligne}")
+                    print(f"⚠️ Erreur de parsing US : {ligne}")
 
             # 2. Alerte Arrêt d'Urgence <⚠️,URGENCE, Capteur X>
             elif "URGENCE" in header or "URGENCE" in line_content(elements):
-                print(f"[RX <- ESP32] ALERTE OBSTACLE PROCHE : {ligne}")
+                print(f"[RX <- ESP32] 🚨 ALERTE OBSTACLE PROCHE : {ligne}")
 
             else:
                 print(f"[RX <- ESP32] Trame inconnue : {ligne}")
@@ -81,22 +83,18 @@ try:
             cycle = (compteur // 30) % 4
 
             if cycle == 0:
-                # Marche avant lente (15 ticks / 20ms sur les 4 roues)
                 print("\n--- Phase 1 : Marche avant lente ---")
                 envoyer_commande_vitesse(15, 15, 15, 15)
 
             elif cycle == 1:
-                # Rotation sur place (Gauches en arrière, Droites en avant)
                 print("\n--- Phase 2 : Rotation sur place ---")
                 envoyer_commande_vitesse(-15, 15, -15, 15)
 
             elif cycle == 2:
-                # Masquage du capteur Avant-Droit (index 1)
                 print("\n--- Phase 3 : Masquage Capteur DAv ---")
                 envoyer_masque_capteurs(0, 1, 0, 0)
 
             elif cycle == 3:
-                # Arrêt complet
                 print("\n--- Phase 4 : Consigne d'arrêt ---")
                 envoyer_commande_vitesse(0, 0, 0, 0)
 
