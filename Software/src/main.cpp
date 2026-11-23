@@ -1,41 +1,185 @@
 #include <Arduino.h>
+#include <WiFi.h>
+#include <ArduinoOTA.h>
 
-//==============Branchements================
-//Liaison UART2 avec Raspberry Pi
+//==============Configuration Wi-Fi & OTA================
+const char *WIFI_SSID = "Robotek 2.4"; //Modifier le nom du wifi
+const char *WIFI_PASS = "RobotekIsTheBest"; //Modifier le mdp du wifi
+const char *OTA_HOSTNAME = "robot-esp32";
+
+// Mettre à 1 dès que les 4 capteurs ultrasons HC-SR04 sont branchés
+#define ULTRASONS_ACTIFS 0
+
+//==============Branchements (23 broches)================
+// Liaison UART2 avec Raspberry Pi 4
 #define RXD2 16
 #define TXD2 17
 
-//Moteurs (Ponts en H) & Encodeurs
-const int PIN_PWM[4] = {13, 12, 5, 2}; // [0]=GAv, [1]=DAv, [2]=GAr, [3]=DAr
+// Moteurs (Ponts en H L298N) & Encodeurs
+// Index : [0]=GAv, [1]=DAv, [2]=GAr, [3]=DAr
+const int PIN_PWM[4] = {13, 12, 5, 2};
 const int PIN_IN1[4] = {26, 33, 19, 22};
 const int PIN_IN2[4] = {27, 25, 18, 21};
 const int PIN_ENC[4] = {4, 14, 32, 15};
 
-//Ultrasons (1 TRIG commun sur GPIO 23 + 4 ECHO sur broches GPI)
+// Ultrasons (1 TRIG commun sur GPIO 23 + 4 ECHO sur broches input-only)
 #define NB_CAPTEURS 4
 #define TRIG_PIN_COMMUN 23
 const uint8_t ECHO_PINS[NB_CAPTEURS] = {34, 35, 36, 39};
-//=============Communication avec Rasbery===============
-const byte b_numChars = 32;
+const float DISTANCE_URGENCE_CM = 20.0f;
+
+//=============Communication avec Raspberry Pi===============
+const byte b_numChars = 48;
 char c_receivedChars[b_numChars];
 boolean bol_newData = false;
-void readSerialData() //Lecture de la data envoyé par la rasbery sur la liaison série sous la forme <V,MoteurAvantGauche, MoteurAvantDroit, MoteurArriereGauche, MoteurArriereGauche>
-{
-  static boolean bol_ReceiveInProgress = false; //false = pas de données transmises, true = données entrain d'être transmises
-  static byte b_index = 0;
-  char c_StartMarker = '<'; //Marqueur de début de la transmission
-  char c_EndMarker = '>';   //Marqueur de fin de la transmission
-  char c_Data; //Data transmise
 
-  while(Serial2.available() > 0 && bol_newData == false)
+int n_motorSpeeds[4] = {0, 0, 0, 0};                    // [0]=GAv, [1]=DAv, [2]=GAr, [3]=DAr
+bool bol_ignoreSensor[4] = {false, false, false, false}; // [0]=Avant, [1]=Droit, [2]=Gauche, [3]=Arrière
+QueueHandle_t motorQueue;
+TaskHandle_t h_ThreadDeplacement = NULL; // Handle pour suspendre le Cœur 1 pendant un flash OTA
+
+// Watchdog de sécurité communication RPi
+const unsigned long WATCHDOG_TIMEOUT_MS = 500;
+unsigned long ul_lastComTime = 0;
+bool bol_watchdogTriggered = false;
+
+//=============Structures PID===============
+struct MotorPID {
+  float Kp = 2.0f;
+  float Ki = 0.4f;
+  float Kd = 0.05f;
+
+  int targetSpeedTicks = 0; // Consigne en ticks par période de 20 ms
+  int prevDirection = 0;
+  long lastTicks = 0;
+
+  float errorSum = 0.0f;
+  float lastError = 0.0f;
+  int pwmOutput = 0;
+};
+MotorPID pid[4];
+
+//=============Commandes Matérielles & Sécurité===============
+void commanderMoteur(int index, int pwmSigne)
+{
+  if (pwmSigne > 0)
+  {
+    digitalWrite(PIN_IN1[index], HIGH);
+    digitalWrite(PIN_IN2[index], LOW);
+    analogWrite(PIN_PWM[index], constrain(pwmSigne, 0, 255));
+  }
+  else if (pwmSigne < 0)
+  {
+    digitalWrite(PIN_IN1[index], LOW);
+    digitalWrite(PIN_IN2[index], HIGH);
+    analogWrite(PIN_PWM[index], constrain(-pwmSigne, 0, 255));
+  }
+  else
+  {
+    digitalWrite(PIN_IN1[index], LOW);
+    digitalWrite(PIN_IN2[index], LOW);
+    analogWrite(PIN_PWM[index], 0);
+  }
+}
+
+void arretUrgenceMoteurs()
+{
+  for (int i = 0; i < 4; i++)
+  {
+    n_motorSpeeds[i] = 0;
+  }
+  if (motorQueue != NULL)
+  {
+    xQueueOverwrite(motorQueue, &n_motorSpeeds);
+  }
+}
+
+//=============Initialisation Wi-Fi & ArduinoOTA===============
+void configurerWiFiEtOTA()
+{
+  WiFi.mode(WIFI_STA);
+  WiFi.setAutoReconnect(true);
+  WiFi.begin(WIFI_SSID, WIFI_PASS);
+
+  Serial.print("Connexion Wi-Fi");
+  unsigned long debutTentative = millis();
+  // Attente max de 5 secondes pour ne pas bloquer le robot si le Wi-Fi est coupé
+  while (WiFi.status() != WL_CONNECTED && (millis() - debutTentative < 5000))
+  {
+    delay(250);
+    Serial.print(".");
+  }
+
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    Serial.printf("\nWi-Fi connecte ! IP : %s | Hostname : %s.local\n",
+                  WiFi.localIP().toString().c_str(), OTA_HOSTNAME);
+  }
+  else
+  {
+    Serial.println("\nWi-Fi non disponible au boot (reconnexion auto en arriere-plan).");
+  }
+
+  ArduinoOTA.setHostname(OTA_HOSTNAME);
+  // Optionnel : décommenter pour protéger le flash par mot de passe
+  // ArduinoOTA.setPassword("robot123");
+
+  ArduinoOTA.onStart([]() {
+    // Sécurité critique : arrêt immédiat des 4 roues et gel de la tâche PID avant écriture Flash
+    arretUrgenceMoteurs();
+    if (h_ThreadDeplacement != NULL)
+    {
+      vTaskSuspend(h_ThreadDeplacement);
+    }
+    for (int i = 0; i < 4; i++)
+    {
+      commanderMoteur(i, 0);
+    }
+    Serial.println("\n[OTA] Debut de la mise a jour Wi-Fi -> Moteurs coupes.");
+  });
+
+  ArduinoOTA.onEnd([]() {
+    Serial.println("\n[OTA] Mise a jour terminee ! Redemarrage...");
+  });
+
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("[OTA] Progression : %u%%\r", (progress / (total / 100)));
+  });
+
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("\n[OTA] Erreur [%u] -> Redemarrage de securite.\n", error);
+    ESP.restart();
+  });
+
+  ArduinoOTA.begin();
+}
+
+//=============Parsing Communication Raspberry Pi===============
+void readSerialData()
+{
+  static boolean bol_ReceiveInProgress = false;
+  static byte b_index = 0;
+  const char c_StartMarker = '<';
+  const char c_EndMarker = '>';
+  char c_Data;
+
+  while (Serial2.available() > 0 && bol_newData == false)
   {
     c_Data = Serial2.read();
-    if(bol_ReceiveInProgress == true)
+    if (bol_ReceiveInProgress == true)
     {
-      if(c_Data != c_EndMarker)
+      if (c_Data == c_StartMarker)
+      {
+        b_index = 0;
+      }
+      else if (c_Data != c_EndMarker)
       {
         c_receivedChars[b_index] = c_Data;
         b_index++;
+        if (b_index >= b_numChars - 1)
+        {
+          b_index = b_numChars - 1;
+        }
       }
       else
       {
@@ -45,87 +189,82 @@ void readSerialData() //Lecture de la data envoyé par la rasbery sur la liaison
         bol_newData = true;
       }
     }
-    else if(c_Data == c_StartMarker)
+    else if (c_Data == c_StartMarker)
     {
       bol_ReceiveInProgress = true;
     }
   }
 }
 
-int n_motorSpeeds[4] = {0, 0, 0, 0}; // Tableau des vitesses : [0] = GAv, [1] = DAv, [2] = GAr, [3] = DAr
-bool bol_ignoreSensor[4] = {false, false, false, false}; // Tableau des capteurs : [0] = Avant, [1] = Droit, [2] = Gauche, [3] = Arrière
-QueueHandle_t motorQueue; // Queue pour transmettre les 4 consignes de vitesse du Cœur 0 au Cœur 1
-// Watchdog de sécurité communication RPi
-const unsigned long WATCHDOG_TIMEOUT_MS = 500; // Timeout de 500 ms
-unsigned long ul_lastComTime = 0; // Time du dernier message reçu
-bool bol_watchdogTriggered = false; // Flag pour éviter de spammer le Serial
-void parseData() //Répartition des valeurs reçu dans les variables de chaque moteur et capteurs
+void parseData()
 {
-  if (bol_newData == true) //Si newData == true on a reçu des nouvelles données à trier
+  if (bol_newData == true)
   {
     char c_typeCmd = c_receivedChars[0];
-    if (c_typeCmd == 'V') //Si le premier caractère est V c'est des données moteurs
+
+    // 1. Consignes de vitesse : <V,GAv,DAv,GAr,DAr> (en ticks / 20 ms)
+    if (c_typeCmd == 'V')
     {
-      if (sscanf(c_receivedChars, "%c,%d,%d,%d,%d", &c_typeCmd, &n_motorSpeeds[0], &n_motorSpeeds[1],&n_motorSpeeds[2],&n_motorSpeeds[3]) == 5) 
+      int v0, v1, v2, v3;
+      if (sscanf(c_receivedChars, "%c,%d,%d,%d,%d", &c_typeCmd, &v0, &v1, &v2, &v3) == 5)
       {
-        ul_lastComTime = millis();     // Reset Watchdog
+        ul_lastComTime = millis();
         bol_watchdogTriggered = false;
 
-        // On envoie le tableau de vitesses dans la Queue vers le ThreadDeplacement
-        xQueueSend(motorQueue, &n_motorSpeeds, 0);
+        n_motorSpeeds[0] = v0;
+        n_motorSpeeds[1] = v1;
+        n_motorSpeeds[2] = v2;
+        n_motorSpeeds[3] = v3;
 
-        //Retour des données dans le monitor
-        Serial.print("✅ OK -> Commande: "); Serial.print(c_typeCmd);
-        Serial.print(" | Moteur GAv: "); Serial.print(n_motorSpeeds[0]);
-        Serial.print(" | Moteur DAv: "); Serial.println(n_motorSpeeds[1]);
-        Serial.print(" | Moteur GAr: "); Serial.print(n_motorSpeeds[2]);
-        Serial.print(" | Moteur DAr: "); Serial.println(n_motorSpeeds[3]);
-        Serial.println("🚗 Vitesses mises à jour");
+        xQueueOverwrite(motorQueue, &n_motorSpeeds);
       }
     }
-    else if(c_typeCmd == 'I') //Si le premier caractère est I c'est des données capteurs
+    // 2. Masquage des capteurs ultrasons : <I,i0,i1,i2,i3>
+    else if (c_typeCmd == 'I')
     {
       int n_i0, n_i1, n_i2, n_i3;
-      if (sscanf(c_receivedChars, "%c,%d,%d,%d,%d", &c_typeCmd, &n_i0, &n_i1, &n_i2, &n_i3) == 5) 
+      if (sscanf(c_receivedChars, "%c,%d,%d,%d,%d", &c_typeCmd, &n_i0, &n_i1, &n_i2, &n_i3) == 5)
       {
-        ul_lastComTime = millis();     // Reset Watchdog 
+        ul_lastComTime = millis();
         bol_watchdogTriggered = false;
 
-        bol_ignoreSensor[0] = (n_i0 == 1); //True si i1 == 1, si true = ignorer les données du capteur.
+        bol_ignoreSensor[0] = (n_i0 == 1);
         bol_ignoreSensor[1] = (n_i1 == 1);
         bol_ignoreSensor[2] = (n_i2 == 1);
         bol_ignoreSensor[3] = (n_i3 == 1);
-        //Retour des données dans le monitor
-        Serial.print("✅ OK -> Commande: "); Serial.print(c_typeCmd);
-        Serial.print(" | Capteur 1 : "); Serial.print(n_i0);
-        Serial.print(" | Capteur 2 : "); Serial.println(n_i1);
-        Serial.print(" | Capteur 3 : "); Serial.print(n_i2);
-        Serial.print(" | Capteur 4 : "); Serial.println(n_i3);
-        Serial.println("🛡️ Masques US mis à jour par la RPi !");
       }
     }
-     else // Si il y a une erreur sur le format d'envois des données : 
-     {
-      Serial.println("❌ Erreur de syntaxe (Format attendu : <V,X0,X1,X2,X3>) ou <I,i1,i2,i3,i4>");
-    }   
-    bol_newData = false; //La transimission est terminé on remet le newData à false
-  }
-}
-void verifierWatchdog() //Watchdog pour arrêter le mouvement si la communication avec la RPI est coupé
-{
-  // Si le temps écoulé dépasse le timeout et que la sécurité n'a pas encore déclenché
-  if ((millis() - ul_lastComTime > WATCHDOG_TIMEOUT_MS) && !bol_watchdogTriggered)
-  {
-    for (int i = 0; i < 4; i++)
+    // 3. Réglage des gains PID depuis la RPi : <P,Kp,Ki,Kd>
+    else if (c_typeCmd == 'P')
     {
-      n_motorSpeeds[i] = 0;
+      float newKp, newKi, newKd;
+      if (sscanf(c_receivedChars, "%c,%f,%f,%f", &c_typeCmd, &newKp, &newKi, &newKd) == 4)
+      {
+        ul_lastComTime = millis();
+        bol_watchdogTriggered = false;
+
+        for (int i = 0; i < 4; i++)
+        {
+          pid[i].Kp = newKp;
+          pid[i].Ki = newKi;
+          pid[i].Kd = newKd;
+          pid[i].errorSum = 0.0f;
+          pid[i].lastError = 0.0f;
+        }
+      }
     }
 
-    // Écrasement prioritaire dans la Queue vers Cœur 1
-    xQueueOverwrite(motorQueue, &n_motorSpeeds);
+    bol_newData = false;
+  }
+}
 
-    Serial.println("🚨 WATCHDOG : Perte de communication RPi ! Arrêt des moteurs.");
-    bol_watchdogTriggered = true; // Sécurité activée
+void verifierWatchdog()
+{
+  if ((millis() - ul_lastComTime > WATCHDOG_TIMEOUT_MS) && !bol_watchdogTriggered)
+  {
+    arretUrgenceMoteurs();
+    Serial2.println("<WATCHDOG,STOP>");
+    bol_watchdogTriggered = true;
   }
 }
 
@@ -133,25 +272,27 @@ void verifierWatchdog() //Watchdog pour arrêter le mouvement si la communicatio
 volatile unsigned long echoStart[NB_CAPTEURS] = {0};
 volatile unsigned long echoEnd[NB_CAPTEURS] = {0};
 volatile bool b_echoReceived[NB_CAPTEURS] = {false, false, false, false};
-float f_distancesUS[NB_CAPTEURS] = {0.0, 0.0, 0.0, 0.0};// Tableau global pour stocker les dernières distances (en cm) pour la télémétrie
-uint8_t currentSensor = 0; // Index du capteur en cours
+float f_distancesUS[NB_CAPTEURS] = {999.0f, 999.0f, 999.0f, 999.0f};
 
-void IRAM_ATTR echoInterrupt() //Interuption lors que le signal est de retour
+void IRAM_ATTR echoInterrupt()
 {
-  // On regarde quelle broche vient de changer d'état pour être sûr de ne pas se tromper
-  if(digitalRead(ECHO_PINS[0]) == HIGH) echoStart[0] = micros();
-  else if(digitalRead(ECHO_PINS[0]) == LOW && echoStart[0] != 0) { echoEnd[0] = micros(); b_echoReceived[0] = true; }
-
-  if(digitalRead(ECHO_PINS[1]) == HIGH) echoStart[1] = micros();
-  else if(digitalRead(ECHO_PINS[1]) == LOW && echoStart[1] != 0) { echoEnd[1] = micros(); b_echoReceived[1] = true; }
-
-  if(digitalRead(ECHO_PINS[2]) == HIGH) echoStart[2] = micros();
-  else if(digitalRead(ECHO_PINS[2]) == LOW && echoStart[2] != 0) { echoEnd[2] = micros(); b_echoReceived[2] = true; }
-
-  if(digitalRead(ECHO_PINS[3]) == HIGH) echoStart[3] = micros();
-  else if(digitalRead(ECHO_PINS[3]) == LOW && echoStart[3] != 0) { echoEnd[3] = micros(); b_echoReceived[3] = true; }
+  unsigned long now = micros();
+  for (int i = 0; i < NB_CAPTEURS; i++)
+  {
+    if (digitalRead(ECHO_PINS[i]) == HIGH)
+    {
+      echoStart[i] = now;
+    }
+    else if (echoStart[i] != 0)
+    {
+      echoEnd[i] = now;
+      b_echoReceived[i] = true;
+      echoStart[i] = 0;
+    }
+  }
 }
-void DeclancherPing()//Envois du signal
+
+void DeclancherPing()
 {
   digitalWrite(TRIG_PIN_COMMUN, LOW);
   delayMicroseconds(2);
@@ -159,184 +300,160 @@ void DeclancherPing()//Envois du signal
   delayMicroseconds(10);
   digitalWrite(TRIG_PIN_COMMUN, LOW);
 }
-void traiterUltrason()//Traitement du signal pour obtenir la distance
+
+void traiterUltrason()
 {
-    if(b_echoReceived[currentSensor] == true)
+  for (int i = 0; i < NB_CAPTEURS; i++)
+  {
+    if (b_echoReceived[i] == true)
     {
-      b_echoReceived[currentSensor] = false;
-      unsigned long duration = echoEnd[currentSensor] - echoStart[currentSensor]; //Calcul du temps mis par l'onde pour faire l'aller retour
-      if(duration > 0 && duration < 25000) //Sécurité
+      b_echoReceived[i] = false;
+      unsigned long duration = echoEnd[i] - echoStart[i];
+
+      if (duration > 0 && duration < 25000)
       {
-        float distance = duration * 0.034/2; //Calcul de la distance parcouru par l'onde à l'allé
-        f_distancesUS[currentSensor] = distance; // Stockage pour la télémétrie
-        Serial.print("Capteur ");
-        Serial.print(currentSensor);
-        Serial.print(" -> Distance = ");
-        Serial.print(distance);
-        Serial.println(" cm");
+        float distance = duration * 0.034f / 2.0f;
+        f_distancesUS[i] = distance;
 
-        if (distance < 20.0 && !bol_ignoreSensor[currentSensor]) //Envois un message d'arrêt aux moteurs si distance < 20 et si la rasberry n'a pas demandé la desactivation du capteur
+        if (distance < DISTANCE_URGENCE_CM && !bol_ignoreSensor[i])
         {
-          //Remise à zéro immédiate du tableau de vitesses
-          for (int i = 0; i < 4; i++)
+          bool moteursEnMouvement = (n_motorSpeeds[0] != 0 || n_motorSpeeds[1] != 0 ||
+                                     n_motorSpeeds[2] != 0 || n_motorSpeeds[3] != 0);
+          if (moteursEnMouvement)
           {
-            n_motorSpeeds[i] = 0;
+            arretUrgenceMoteurs();
+            Serial2.printf("<URGENCE,%d,%.1f>\n", i, distance);
           }
-
-          //Écrasement prioritaire dans la Queue FreeRTOS pour le Cœur 1
-          xQueueOverwrite(motorQueue, &n_motorSpeeds);
-
-          //A envoyer à la rasberry
-          Serial.print("<⚠️,URGENCE, Capteur ");
-          Serial.print(currentSensor);
-          Serial.println(">");
         }
       }
     }
-    currentSensor = (currentSensor + 1) % NB_CAPTEURS; // Utilisation du modulo pour boucler de 0 à 3
-}
-void envoyerTelemetrieUS()//Fonction pour envoyer régulièrement la télémétrie à la RPi
-{
-  Serial2.print("<US,");
-  Serial2.print(f_distancesUS[0], 1); Serial2.print(",");
-  Serial2.print(f_distancesUS[1], 1); Serial2.print(",");
-  Serial2.print(f_distancesUS[2], 1); Serial2.print(",");
-  Serial2.print(f_distancesUS[3], 1);
-  Serial2.println(">");
+  }
 }
 
-//=============Deplacement===============
-//Comptage des Ticks par Interruption
+void envoyerTelemetrieUS()
+{
+  Serial2.printf("<US,%.1f,%.1f,%.1f,%.1f>\n",
+                 f_distancesUS[0], f_distancesUS[1], f_distancesUS[2], f_distancesUS[3]);
+}
+
+//=============Encodeurs===============
 volatile long tickCounters[4] = {0, 0, 0, 0};
+portMUX_TYPE encMux = portMUX_INITIALIZER_UNLOCKED;
+
 void IRAM_ATTR Encoder0() { tickCounters[0]++; }
 void IRAM_ATTR Encoder1() { tickCounters[1]++; }
 void IRAM_ATTR Encoder2() { tickCounters[2]++; }
 void IRAM_ATTR Encoder3() { tickCounters[3]++; }
 
-struct MotorPID {
-    float Kp = 1.2;
-    float Ki = 0.05;
-    float Kd = 0.01;
-
-    int targetSpeedTicks = 0; // Consigne en ticks : 20ms
-    long lastTicks = 0;
-    
-    float errorSum = 0;
-    float lastError = 0;
-    
-    int pwmOutput = 0;
-};
-MotorPID pid[4];
-
-//=============Threads===============
-void ThreadComRasbe(void * parameter) //Thread 1 : Communication RPI et gestion ultrasons
+//=============Threads FreeRTOS===============
+void ThreadComRasbe(void *parameter) // Cœur 0 : Wi-Fi OTA, UART2 RPi & Ultrasons
 {
   unsigned long dernierPing = 0;
   unsigned long derniereTelemetrie = 0;
-  ul_lastComTime = millis(); // Initialisation au démarrage
-  while(1)
+  ul_lastComTime = millis();
+
+  while (1)
   {
-    readSerialData(); //Lecture de la liaison série avec la RPI
-    parseData(); //Traitement des données reçu par la liaison série avec la RPI
-    verifierWatchdog(); // Contrôle permanent du timeout
-    
-    if (millis() - dernierPing > 50) //On envoit une onde sur les ultrasons toutes les 50ms sans bloquer le programme
+    ArduinoOTA.handle(); // Écoute les demandes de flash Wi-Fi sans bloquer
+
+    readSerialData();
+    parseData();
+    verifierWatchdog();
+
+#if ULTRASONS_ACTIFS
+    if (millis() - dernierPing >= 50)
     {
-      DeclancherPing(); 
+      DeclancherPing();
       dernierPing = millis();
     }
-    traiterUltrason(); // On traite le retour du signal s'il est prêt
+    traiterUltrason();
 
-    if (millis() - derniereTelemetrie > 100) // Envoi de la télémétrie à la RPi toutes les 100ms pour ne pas bloquer la liaison série
+    if (millis() - derniereTelemetrie >= 100)
     {
       envoyerTelemetrieUS();
       derniereTelemetrie = millis();
     }
+#endif
 
-    vTaskDelay(10 / portTICK_PERIOD_MS);
+    vTaskDelay(pdMS_TO_TICKS(10));
   }
 }
-void ThreadDeplacement(void * parameter) //Thread 2 : Gestion des moteurs
+
+void ThreadDeplacement(void *parameter) // Cœur 1 : Boucle PID stricte à 50 Hz (20 ms)
 {
   int n_consignesMoteurs[4] = {0, 0, 0, 0};
   TickType_t LastWakeTime = xTaskGetTickCount();
   const TickType_t Frequency = pdMS_TO_TICKS(20);
-  
-  while(1)
+
+  while (1)
   {
-    if (xQueueReceive(motorQueue, &n_consignesMoteurs, 0) == pdTRUE) // On regarde si de nouvelles consignes sont arrivées dans la Queue
+    if (xQueueReceive(motorQueue, &n_consignesMoteurs, 0) == pdTRUE)
     {
-      // Réception des nouvelles consignes sur le Cœur 1 !
-      for (int i = 0; i <4; i++)
+      for (int i = 0; i < 4; i++)
       {
+        int newDir = (n_consignesMoteurs[i] > 0) ? 1 : ((n_consignesMoteurs[i] < 0) ? -1 : 0);
+        if (newDir != pid[i].prevDirection)
+        {
+          pid[i].errorSum = 0.0f;
+          pid[i].lastError = 0.0f;
+          pid[i].prevDirection = newDir;
+        }
         pid[i].targetSpeedTicks = n_consignesMoteurs[i];
       }
-      Serial.print("⚙️ Cœur 1 a reçu les nouvelles consignes : ");
-      Serial.print(n_consignesMoteurs[0]); Serial.print(", ");
-      Serial.print(n_consignesMoteurs[1]); Serial.print(", ");
-      Serial.print(n_consignesMoteurs[2]); Serial.print(", ");
-      Serial.println(n_consignesMoteurs[3]);
     }
+
     for (int i = 0; i < 4; i++)
     {
-      // Lecture de la vitesse réelle (ticks mesurés pendant les 20ms)
+      portENTER_CRITICAL(&encMux);
       long currentTicks = tickCounters[i];
+      portEXIT_CRITICAL(&encMux);
+
       long measuredSpeed = currentTicks - pid[i].lastTicks;
       pid[i].lastTicks = currentTicks;
 
-      // Calcul de l'erreur
-      float error = abs(pid[i].targetSpeedTicks) - measuredSpeed;
+      if (pid[i].targetSpeedTicks == 0)
+      {
+        pid[i].errorSum = 0.0f;
+        pid[i].lastError = 0.0f;
+        pid[i].pwmOutput = 0;
+        commanderMoteur(i, 0);
+        continue;
+      }
 
-      // Terme Intégral avec anti-windup
-      pid[i].errorSum += error;
-      pid[i].errorSum = constrain(pid[i].errorSum, -500.0, 500.0);
+      float targetAbs = (float)abs(pid[i].targetSpeedTicks);
+      float error = targetAbs - (float)measuredSpeed;
 
-      // Terme Dérivé
+      pid[i].errorSum = constrain(pid[i].errorSum + error, -800.0f, 800.0f);
       float derivative = error - pid[i].lastError;
       pid[i].lastError = error;
 
-      //Calcul PID
       float output = (pid[i].Kp * error) + (pid[i].Ki * pid[i].errorSum) + (pid[i].Kd * derivative);
-      pid[i].pwmOutput += (int)output;
-      pid[i].pwmOutput = constrain(pid[i].pwmOutput, 0, 255);
+      pid[i].pwmOutput = constrain((int)output, 0, 255);
 
-      // Signe du PWM
-      int finalPWM = (pid[i].targetSpeedTicks >= 0) ? pid[i].pwmOutput : -pid[i].pwmOutput;
-      if (pid[i].targetSpeedTicks == 0) 
-      {
-        finalPWM = 0;
-        pid[i].errorSum = 0;
-      }
-
-      // Application matérielle aux ponts en H
-      if (finalPWM >= 0) 
-      {
-      digitalWrite(PIN_DIR[i], HIGH);
-      } 
-      else 
-      {
-        digitalWrite(PIN_DIR[i], LOW);
-        finalPWM = -finalPWM;
-      }
-      analogWrite(PIN_PWM[i], constrain(finalPWM, 0, 255));
+      int finalPWM = (pid[i].targetSpeedTicks > 0) ? pid[i].pwmOutput : -pid[i].pwmOutput;
+      commanderMoteur(i, finalPWM);
     }
+
     vTaskDelayUntil(&LastWakeTime, Frequency);
   }
 }
 
 //=============Setup===============
-void setup() {
+void setup()
+{
   Serial.begin(115200);
-  //Communication UART avec Pi
   Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
-  // Création d'une Queue pouvant contenir 1 élément (le tableau de 4 int)
+
   motorQueue = xQueueCreate(1, sizeof(n_motorSpeeds));
 
-  // Initialisation Moteurs & Encodeurs
-  for (int i = 0; i < 4; i++) 
+  // Initialisation Moteurs & Encodeurs (en premier pour sécuriser les sorties à LOW)
+  for (int i = 0; i < 4; i++)
   {
     pinMode(PIN_PWM[i], OUTPUT);
-    pinMode(PIN_DIR[i], OUTPUT);
+    pinMode(PIN_IN1[i], OUTPUT);
+    pinMode(PIN_IN2[i], OUTPUT);
+    commanderMoteur(i, 0);
+
     pinMode(PIN_ENC[i], INPUT_PULLUP);
   }
   attachInterrupt(digitalPinToInterrupt(PIN_ENC[0]), Encoder0, RISING);
@@ -344,19 +461,28 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(PIN_ENC[2]), Encoder2, RISING);
   attachInterrupt(digitalPinToInterrupt(PIN_ENC[3]), Encoder3, RISING);
 
-  // Configuration des broches pour les 4 capteurs & Attachement des interruptions sur les 4 pins ECHO
-  for (int i = 0; i < NB_CAPTEURS; i++) {
-    pinMode(TRIG_PIN_COMMUN, OUTPUT);
+#if ULTRASONS_ACTIFS
+  pinMode(TRIG_PIN_COMMUN, OUTPUT);
+  digitalWrite(TRIG_PIN_COMMUN, LOW);
+  for (int i = 0; i < NB_CAPTEURS; i++)
+  {
     pinMode(ECHO_PINS[i], INPUT);
-    attachInterrupt(digitalPinToInterrupt(ECHO_PINS[i]), echoInterrupt, CHANGE); //Interuption
+    attachInterrupt(digitalPinToInterrupt(ECHO_PINS[i]), echoInterrupt, CHANGE);
   }
+#endif
 
-  //Création des Threads
+  // Démarrage Wi-Fi et serveur OTA
+  configurerWiFiEtOTA();
+
+  // Création des Threads sur les deux cœurs
   xTaskCreatePinnedToCore(ThreadComRasbe, "CommunicationRasbery", 10000, NULL, 1, NULL, 0);
-  xTaskCreatePinnedToCore(ThreadDeplacement, "Deplacement", 10000, NULL, 1, NULL, 1);
+  xTaskCreatePinnedToCore(ThreadDeplacement, "Deplacement", 10000, NULL, 1, &h_ThreadDeplacement, 1);
+
+  Serial.println("ESP32 pret (UART2 + OTA Wi-Fi actifs).");
 }
 
 //=============Loop===============
-void loop() {
+void loop()
+{
   vTaskDelete(NULL);
 }
